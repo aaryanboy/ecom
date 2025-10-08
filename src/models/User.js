@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isOwner: { type: Boolean, required: true,default: false },   // owner/admin flag
-  sessionToken: { type: String, required: true, default: null }, // store session token
+  sessionToken: { type: String, default: null }, // store session token
 
   // Profile info
   firstName: String,
