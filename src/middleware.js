@@ -1,23 +1,18 @@
-// middleware.js (at root of your project or in /app)
+// middleware.js
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
-  const token = req.cookies.get("session"); // read cookie
-  console.log("Session token value:", token?.value); // log the value
-  console.log("hello from middleware")
+  const token = req.cookies.get("session");
+  console.log("Session token:", token?.value);
+  console.log("Middleware running ✅");
 
-
-
-  // redirect if no session
   if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // allow request to continue
   return NextResponse.next();
 }
 
-// Specify which paths this middleware applies to
 export const config = {
-  matcher: ["/dashboard/:path*"], // applies to /shop and all subpaths
+  matcher: ["/dashboard/:path*"], // ✅ update this to match your actual URL
 };

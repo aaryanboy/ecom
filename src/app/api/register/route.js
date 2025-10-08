@@ -31,7 +31,16 @@ export async function POST(req) {
     await newUser.save();
 
     return NextResponse.json(
-      { message: "User stored successfully", data: newUser },
+      { message: "User stored successfully",  
+        data: {
+        username: newUser.username,
+        email: newUser.email,
+        isOwner: newUser.isOwner,
+        addresses: newUser.addresses,
+        cart: newUser.cart,
+        wishlist: newUser.wishlist,
+        orders: newUser.orders
+      } },
       { status: 201 }
     );
 

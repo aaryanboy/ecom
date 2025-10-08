@@ -26,7 +26,9 @@ export async function POST(req) {
 
     // Save session token in DB (optional, good for security)
     existingUser.sessionToken = token;
-    await existingUser.save();
+    await existingUser.save();  
+    console.log("User logged in:", existingUser.email);
+    console.log("Session token:", token);
 
     // Send response with cookie
     const response = NextResponse.json(

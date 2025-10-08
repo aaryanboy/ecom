@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from "../(theme)/ThemeContext"; 
+import { useTheme } from "@/app/(theme)/ThemeContext";
 
 
 export default function dashboard() {

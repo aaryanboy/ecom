@@ -6,7 +6,7 @@ export async function GET(req) {
   try {
     await connectToDatabase();
 
-    const session = req.cookies.get("session")?.value;
+    const session = req.cookies.get("session");
 
     if (!session) {
       return NextResponse.json({ loggedIn: false });
