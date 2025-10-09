@@ -2,8 +2,8 @@
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
-  const token = req.cookies.get("session");
-  console.log("Session token:", token?.value);
+  const token = req.cookies.get("session")?.value;
+  console.log("Session token:", token);
   console.log("Middleware running ✅");
 
   if (!token) {
@@ -14,5 +14,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"], // ✅ update this to match your actual URL
+  matcher: ["/dashboard/:path*", "/explore/:path*"], // ✅ protect dashboard & explore
 };

@@ -1,3 +1,4 @@
+// app/api/check-session/route.js
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db.js";
 import User from "@/models/User.js";
@@ -6,7 +7,7 @@ export async function GET(req) {
   try {
     await connectToDatabase();
 
-    const session = req.cookies.get("session");
+    const session = req.cookies.get("session")?.value;
 
     if (!session) {
       return NextResponse.json({ loggedIn: false });
@@ -20,7 +21,10 @@ export async function GET(req) {
 
     return NextResponse.json({
       loggedIn: true,
-      user: { email: user.email },
+      user: {
+        email: user.email,
+        isOwner: user.isOwner, // 👈 include the boolean
+      },
     });
   } catch (error) {
     console.error("Error fetching session:", error);

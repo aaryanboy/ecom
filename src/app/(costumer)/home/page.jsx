@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
-export default function Dashboard() {
+export default function Home() {
   const { theme, toggleTheme, isDark } = useTheme();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,12 +14,7 @@ export default function Dashboard() {
         const res = await fetch("/api/check-session");
         const data = await res.json();
 
-        if (data.loggedIn) {
-          setUser(data.user);
-        } else {
-          // Optional: redirect to login if not logged in
-          window.location.href = "/login";
-        }
+       
       } catch (error) {
         console.error("Error fetching session:", error);
       } finally {
@@ -48,7 +43,9 @@ export default function Dashboard() {
             {user.isOwner ? "✅ Owner Account" : "👤 Regular User"}
           </p>
 
-          {/* 👑 Owner-only section */}
+          {/* 👑 Owner-only section */} 
+
+          
           {user.isOwner && (
             <div className="mt-6 p-4 bg-cyan-900/30 rounded-lg">
               <h2 className="text-xl font-semibold mb-2">Owner Controls</h2>
