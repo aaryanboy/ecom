@@ -1,7 +1,8 @@
 import "./globals.css";
 import { ThemeProvider } from "./(theme)/ThemeContext";
-import SideBar from "@/components/SideBar";
-import ThemeWrapper from "./(theme)/ThemeWrapper"; // 👈 new client component
+import  Header  from "@/components/Header";
+import ThemeWrapper from "./(theme)/ThemeWrapper";
+import { AuthProvider } from "./(auth)/AuthContext"; // ✅ import
 
 export default function RootLayout({ children }) {
   return (
@@ -9,10 +10,12 @@ export default function RootLayout({ children }) {
       <body>
         <ThemeProvider>
           <ThemeWrapper>
-            <div className="flex">
-              <SideBar />
-              <main className="ml-56 flex-1">{children}</main>
-            </div>
+            <AuthProvider> {/* ✅ wrap your app here */}
+              <div className="flex">
+                <Header />
+                <main className="pt-20 flex-1">{children}</main>
+              </div>
+            </AuthProvider>
           </ThemeWrapper>
         </ThemeProvider>
       </body>

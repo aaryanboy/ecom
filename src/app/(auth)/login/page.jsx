@@ -22,9 +22,17 @@ export default function Login() {
       const response = await axios.post("/api/login", { email, password });
 
       console.log("Login successful:", response.data);
-
+      
+      
       // ✅ redirect to homepage or dashboard after success
-      router.push("/dashboard"); // or "/home"
+
+      if (response.data.user?.isOwner) {
+        window.location.href = "/owner/ownerdashboard";
+      } else {
+        window.location.href = "/dashboard";
+      }
+      
+      
     } catch (error) {
       if (error.response) {
         setError(error.response.data.error || "Login failed");

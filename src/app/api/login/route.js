@@ -32,7 +32,8 @@ export async function POST(req) {
 
     // Send response with cookie
     const response = NextResponse.json(
-      { message: "Login successful", user: { email: existingUser.email } },
+      { message: "Login successful", user: { email: existingUser.email,
+                                              isOwner: existingUser.isOwner } },
       { status: 200 }
     );
 

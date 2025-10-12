@@ -1,18 +1,36 @@
 // middleware.js
 import { NextResponse } from "next/server";
 
-export function middleware(req) {
-  const token = req.cookies.get("session")?.value;
-  console.log("Session token:", token);
-  console.log("Middleware running ✅");
+export async function middleware(req) {
+  const url = req.nextUrl.clone();
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  // Only protect /owner routes
+  if (url.pathname.startsWith("/owner")) {
+    const sessionCookie = req.cookies.get("session")?.value;
+
+    if (!sessionCookie) {
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+
+    // Call your check-session API
+    const res = await fetch(`${req.nextUrl.origin}/api/check-session`, {
+      headers: { cookie: `session=${sessionCookie}` },
+    });
+
+    const data = await res.json();
+
+    // Redirect non-logged-in or non-owner users
+    if (!data.loggedIn || !data.user?.isOwner) {
+      url.pathname = "/dashboard"; // customer dashboard
+      return NextResponse.redirect(url);
+    }
   }
 
   return NextResponse.next();
 }
 
+// Apply only to /owner pages
 export const config = {
-  matcher: ["/dashboard/:path*", "/explore/:path*", "/home/:path*"], // ✅ protect dashboard & explore
+  matcher: ["/owner/:path*"],
 };

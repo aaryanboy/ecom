@@ -19,11 +19,12 @@ export async function GET(req) {
       return NextResponse.json({ loggedIn: false });
     }
 
+    // Return user with isOwner directly
     return NextResponse.json({
       loggedIn: true,
       user: {
         email: user.email,
-        isOwner: user.isOwner, // 👈 include the boolean
+        isOwner: user.isOwner,
       },
     });
   } catch (error) {
