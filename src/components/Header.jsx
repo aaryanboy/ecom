@@ -31,7 +31,7 @@ const Header = () => {
   ];
 
   const ownerLinks = [
-    { name: "Owner Dashboard", path: "/owner" },
+    { name: "Dashboard", path: "/owner/dashboard" },
     { name: "Manage Users", path: "/owner/users" },
     { name: "Reports", path: "/owner/reports" },
     { name: "Settings", path: "/settings" },
