@@ -1,48 +1,43 @@
-"use client"
-
+"use client";
 
 import Link from "next/link";
 import axios from "axios";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
-
-
 export default function Login() {
-
   const { theme } = useTheme();
+  const router = useRouter(); // ✅ initialize router
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-    const [email,setEmail]=useState("");
-    const [password,setPassword]=useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    const handleSubmit= async (e)=>{
-        e.preventDefault()
-        
-        try {
-          const response = await axios.post('/api/login', {
-          
-            email,
-            password,
-            
-          });
-          console.log("Registration successful:", response.data);
-        } catch (error) {
-          if (error.response) {
-            // Server responded with a status code outside 2xx
-            console.log("Server responded with error:", error.response.data);
-          } else if (error.request) {
-            // Request was made but no response received
-            console.log("No response received:", error.request);
-          } else {
-            // Something else caused the error
-            console.log("Error setting up request:", error.message);
-          }
-        }
-        
+    try {
+      const response = await axios.post("/api/login", { email, password });
 
+      console.log("Login successful:", response.data);
+
+      // ✅ redirect to homepage or dashboard after success
+      router.push("/dashboard"); // or "/home"
+    } catch (error) {
+      if (error.response) {
+        setError(error.response.data.error || "Login failed");
+        console.log("Server responded with error:", error.response.data);
+      } else if (error.request) {
+        setError("No response from server");
+        console.log("No response received:", error.request);
+      } else {
+        setError("Request error");
+        console.log("Error setting up request:", error.message);
+      }
     }
-
+  };
 
   return (
     <div className={`flex items-center justify-center min-h-screen ${theme.background}`}>
@@ -55,7 +50,7 @@ export default function Login() {
             <input
               type="text"
               name="email"
-              onChange={(e)=>setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -65,15 +60,17 @@ export default function Login() {
             <input
               type="password"
               name="password"
-              onChange={(e)=>setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
+          {error && <p className="text-red-500 text-center">{error}</p>}
+
           <div className="flex items-center justify-between mt-6">
             <button
               type="submit"
-              className={`${theme.button}  px-4 py-2 rounded ${theme.buttonHover} ${theme.textHover} transition`}
+              className={`${theme.button} px-4 py-2 rounded ${theme.buttonHover} ${theme.textHover} transition`}
             >
               Login
             </button>
