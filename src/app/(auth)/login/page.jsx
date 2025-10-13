@@ -27,7 +27,7 @@ export default function Login() {
       // ✅ redirect to homepage or dashboard after success
 
       if (response.data.user?.isOwner) {
-        window.location.href = "/owner/ownerdashboard";
+        window.location.href = "/owner/dashboard";
       } else {
         window.location.href = "/dashboard";
       }
