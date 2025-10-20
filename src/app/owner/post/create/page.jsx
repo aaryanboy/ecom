@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/app/(theme)/ThemeContext";
 
 export default function CreatePost() {
   const [title, setTitle] = useState("");
@@ -10,6 +11,7 @@ export default function CreatePost() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const router = useRouter();
+  const { theme } = useTheme();
 
   const addTag = () => {
     if (!tagInput.trim()) return;
@@ -28,50 +30,111 @@ export default function CreatePost() {
     });
     const data = await res.json();
     if (res.ok) {
-      alert("Post created!");
+      alert("✅ Post created successfully!");
       router.push(`/owner/post/show/${data._id}`);
     } else {
-      alert("Error: " + data.error);
+      alert("❌ Error: " + data.error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white">
-      <h2>Create Post</h2>
-      <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Price"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      <div>
+    <div
+      className={`min-h-screen flex justify-center items-center ${theme.background} ${theme.text} transition-colors duration-300`}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className={`w-full max-w-lg p-8 rounded-2xl shadow-lg border ${theme.card} ${theme.border}`}
+      >
+        <h2 className={`text-2xl font-semibold mb-6 text-center ${theme.text}`}>
+          📝 Create New Post
+        </h2>
+
+        {/* Title */}
         <input
-          placeholder="Add Tag"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
+          type="text"
+          placeholder="Post Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+          className={`w-full p-3 mb-4 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
         />
-        <button type="button" onClick={addTag}>Add Tag</button>
-      </div>
-      <ul>
-        {tags.map((t) => (
-          <li key={t}>
-            {t} <button type="button" onClick={() => removeTag(t)}>x</button>
-          </li>
-        ))}
-      </ul>
-      <button type="submit">Create</button>
-    </form>
+
+        {/* Description */}
+        <textarea
+          placeholder="Write description..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows="4"
+          required
+          className={`w-full p-3 mb-4 rounded-lg border focus:ring-2 outline-none resize-none ${theme.border} ${theme.background} ${theme.text}`}
+        />
+
+        {/* Amount and Price */}
+        <div className="flex space-x-3 mb-4">
+          <input
+            type="number"
+            placeholder="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+            className={`w-1/2 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          />
+          <input
+            type="number"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+            className={`w-1/2 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          />
+        </div>
+
+        {/* Tags */}
+        <div className="mb-3 flex space-x-2">
+          <input
+            placeholder="Add a tag..."
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            className={`flex-1 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          />
+          <button
+            type="button"
+            onClick={addTag}
+            className={`px-4 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
+          >
+            Add
+          </button>
+        </div>
+
+        {/* Tag List */}
+        {tags.length > 0 && (
+          <ul className="flex flex-wrap gap-2 mb-4">
+            {tags.map((t) => (
+              <li
+                key={t}
+                className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${theme.border} border`}
+              >
+                {t}
+                <button
+                  type="button"
+                  onClick={() => removeTag(t)}
+                  className="text-red-500 hover:text-red-700 font-bold"
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className={`w-full py-3 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
+        >
+          🚀 Create Post
+        </button>
+      </form>
+    </div>
   );
 }
