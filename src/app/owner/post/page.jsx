@@ -28,43 +28,8 @@ export default function StartPage() {
           ➕ Create New Post
         </button>
 
-        {/* Input Field */}
-        <div className="space-y-3 mt-4">
-          <input
-            type="text"
-            placeholder="Enter Post ID"
-            value={postId}
-            onChange={(e) => setPostId(e.target.value)}
-            className={`w-full p-2 rounded-lg border outline-none focus:ring-2 transition ${theme.border} ${theme.background} ${theme.text}`}
-          />
-
-          {/* Action Buttons */}
-          <div className="flex space-x-2">
-            <button
-              onClick={() => router.push(`/owner/post/edit/${postId}`)}
-              disabled={!postId}
-              className={`flex-1 py-2 rounded-lg font-medium transition ${
-                postId
-                  ? `${theme.button} ${theme.buttonHover}`
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
-            >
-              ✏️ Edit Post
-            </button>
-
-            <button
-              onClick={() => router.push(`/owner/post/show/${postId}`)}
-              disabled={!postId}
-              className={`flex-1 py-2 rounded-lg font-medium transition ${
-                postId
-                  ? `${theme.button} ${theme.buttonHover}`
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
-            >
-              👁️ Show Post
-            </button>
-          </div>
-        </div>
+        
+        
       </div>
 
       <ShowPosts/>
