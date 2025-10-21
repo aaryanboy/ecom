@@ -17,16 +17,19 @@ const Header = () => {
   const loggedOutLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
+    { name: "Costumer Support", path: "/support" },
+    { name: "New Arrival", path: "/new-arrivals" },
+    { name: "Location", path: "/location" },
     { name: "Buy me a Coffee", path: "/contact" },
   ];
 
   const customerLinks = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Income", path: "/transactions" },
-    { name: "Expenses", path: "/budget" },
-    { name: "Reminders", path: "/reports" },
-    { name: "Budget", path: "/settings" },
-    { name: "Settings", path: "/settings" },
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Costumer Support", path: "/support" },
+    { name: "New Arrival", path: "/new-arrivals" },
+    { name: "Location", path: "/location" },
+    { name: "Cart", path: "/cart" },
     { name: "Buy me a Coffee", path: "/contact" },
   ];
 
