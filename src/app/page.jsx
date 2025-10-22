@@ -9,7 +9,7 @@ export default function Home() {
   const { theme, toggleTheme, isDark } = useTheme();
   return (
   <div className={`text-cyan-50`}>  
-<Products/>  
+<Products/>  god help me
   </div>
   
   );
