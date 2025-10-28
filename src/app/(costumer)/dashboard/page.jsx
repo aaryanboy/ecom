@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   return (
     <div className={`text-cyan-50 p-6`}>
-      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-4">Dashsboard</h1>
 
       {user ? (
         <div className="space-y-3">

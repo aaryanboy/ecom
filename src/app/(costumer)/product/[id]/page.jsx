@@ -50,7 +50,7 @@ export default function ProductDetail() {
         {/* Product Info */}
         <div className="flex-1">
           <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
-          <p className="text-gray-600 mb-5">{product.detail}</p>
+          <p className="text-gray-600 mb-5">{product.description}</p>
 
           {product.price && (
             <p className="text-2xl font-semibold text-green-600 mb-6">

@@ -29,7 +29,7 @@ export default function Login() {
       if (response.data.user?.isOwner) {
         window.location.href = "/owner/dashboard";
       } else {
-        window.location.href = "/dashboard";
+        window.location.href = "/";
       }
       
       
