@@ -1,78 +1,55 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function ProductDetail() {
-  const { id } = useParams();
+export default function ProductList() {
   const router = useRouter();
-  const [product, setProduct] = useState(null);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const imagee = "/logo.svg"
 
   useEffect(() => {
-    // Fetch products and find one by ID
     fetch("/api/owner/post")
       .then((res) => res.json())
-      .then((data) => {
-        const found = data.find((item) => item._id === id);
-        setProduct(found);
-      })
-      .catch((err) => console.error("❌ Failed to fetch product:", err))
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("❌ Failed to fetch products:", err))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, []);
 
   if (loading) {
     return <div className="text-center py-16">Loading...</div>;
   }
 
-  if (!product) {
-    return <div className="text-center py-16 text-red-500">Product not found.</div>;
+  if (products.length === 0) {
+    return <div className="text-center py-16 text-red-500">No products found.</div>;
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <button
-        onClick={() => router.back()}
-        className="text-blue-600 hover:underline mb-6 inline-block"
-      >
-        ← Back
-      </button>
+    <div className="max-w-6xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-8 text-center">All Products</h1>
 
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        {/* Product Image */}
-        <div className="w-full md:w-1/2 rounded-2xl overflow-hidden shadow-md">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="w-full h-[400px] object-cover"
-          />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        {products.map((product) => (
+          <div
+            key={product._id}
+            className="border rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+            onClick={() => router.push(`/product/${product._id}`)}
+          >
+            <img
+              src={imagee}
+              alt={product.title}
+              className="w-full h-64 object-cover"
+            />
 
-        {/* Product Info */}
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
-          <p className="text-gray-600 mb-5">{product.detail}</p>
-
-          {product.price && (
-            <p className="text-2xl font-semibold text-green-600 mb-6">
-              💰 {product.price} NPR
-            </p>
-          )}
-
-          <div className="flex gap-4">
-            <button
-              onClick={() => alert("Added to cart!")}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              🛒 Add to Cart
-            </button>
-            <button
-              onClick={() => alert("Proceeding to checkout...")}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-            >
-              💰 Buy Now
-            </button>
+            <div className="p-4">
+              <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
+              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+              {product.price && (
+                <p className="text-green-600 font-bold">💰 {product.price} NPR</p>
+              )}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

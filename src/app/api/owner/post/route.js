@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db";
 import Post from "@/models/Post";
 
-// CREATE (POST)
+// CREATE
 export async function POST(req) {
   await connectToDatabase();
   try {
@@ -22,7 +22,7 @@ export async function GET() {
   return NextResponse.json(posts);
 }
 
-// --- BELOW HANDLES DYNAMIC ROUTES ---
+// UPDATE (PUT)
 export async function PUT(req) {
   await connectToDatabase();
   const { id, ...data } = await req.json();
