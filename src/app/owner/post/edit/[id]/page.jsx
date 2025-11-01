@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { uploadProductImage, deleteProductImage } from "@/lib/supabase";
 
 export default function EditPost() {
   const { id } = useParams();
@@ -16,9 +17,27 @@ export default function EditPost() {
       .then((data) => {
         const target = data.find((p) => p._id === id);
         setPost(target);
+        
+        // Set current image if exists
+        if (target?.image && target.image.url) {
+          setCurrentImage(target.image);
+          setImagePreview(target.image.url);
+        }
       })
       .catch((err) => console.error("Error fetching post:", err));
   }, [id]);
+  
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (!post) return <p className="text-center mt-10">Loading...</p>;
 
@@ -34,17 +53,46 @@ export default function EditPost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/owner/post", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(post),
-    });
+    
+    try {
+      setUploading(true);
+      
+      // Handle image upload
+      let imageData = currentImage;
+      
+      // If a new image is selected, upload it and delete the old one
+      if (imageFile) {
+        // Delete old image if exists
+        if (currentImage && currentImage.path) {
+          await deleteProductImage(currentImage.path);
+        }
+        
+        // Upload new image
+        imageData = await uploadProductImage(imageFile);
+      }
+      
+      const updatedPost = {
+        ...post,
+        image: imageData
+      };
+      
+      const res = await fetch("/api/owner/post", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedPost),
+      });
 
-    if (res.ok) {
-      alert("✅ Post updated successfully!");
-      router.push(`/owner/post/show/${id}`);
-    } else {
+      if (res.ok) {
+        alert("✅ Post updated successfully!");
+        router.push(`/owner/post/show/${id}`);
+      } else {
+        alert("❌ Error updating post");
+      }
+    } catch (error) {
+      console.error("Error updating post:", error);
       alert("❌ Error updating post");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -79,6 +127,28 @@ export default function EditPost() {
           required
           className={`w-full p-3 mb-4 rounded-lg border focus:ring-2 outline-none resize-none ${theme.border} ${theme.background} ${theme.text}`}
         />
+        
+        {/* Image Upload */}
+        <div className="mb-4">
+          <label className={`block text-sm font-medium mb-2 ${theme.text}`}>
+            Product Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          />
+          {imagePreview && (
+            <div className="mt-2">
+              <img 
+                src={imagePreview} 
+                alt="Preview" 
+                className="h-40 object-contain border rounded-lg"
+              />
+            </div>
+          )}
+        </div>
 
         {/* Amount and Price */}
         <div className="flex space-x-3 mb-4">

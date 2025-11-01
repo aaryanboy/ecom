@@ -7,6 +7,10 @@ const PostSchema = new mongoose.Schema(
     amount: { type: Number, default: 0 },
     price: { type: Number, required: true },
     tags: { type: [String], default: [] },
+    image: { 
+      url: { type: String, default: "" },
+      path: { type: String, default: "" }
+    },
   },
   { timestamps: true }
 );

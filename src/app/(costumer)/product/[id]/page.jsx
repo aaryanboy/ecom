@@ -43,7 +43,7 @@ export default function ProductDetail() {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className="w-full md:w-1/2 rounded-2xl overflow-hidden shadow-md">
           <img
-            src={imagee}
+            src={product.image?.url || imagee}
             alt={product.title}
             className="w-full h-[400px] object-cover"
           />

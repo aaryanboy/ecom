@@ -49,6 +49,13 @@ export default function ShowPosts() {
       className={`grid grid-cols-12 gap-4 px-6 py-4 border-b cursor-pointer hover:shadow-md transition ${theme.card} ${theme.border}`}
       onClick={() => router.push(`/owner/post/show/${post._id}`)}
     >
+      {post.image?.url && (
+        <img
+          src={post.image.url}
+          alt={post.title}
+          className="w-full h-64 object-cover"
+        />
+      )}
       {/* Item Details Column */}
       <div className="col-span-4">
         <h3 className="text-lg font-semibold">{post.title}</h3>

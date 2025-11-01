@@ -36,7 +36,7 @@ export default function ProductList() {
             onClick={() => router.push(`/product/${product._id}`)}
           >
             <img
-              src={imagee}
+              src={product.image?.url || imagee}
               alt={product.title}
               className="w-full h-64 object-cover"
             />

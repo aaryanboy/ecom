@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { uploadProductImage } from "@/lib/supabase";
 
 export default function CreatePost() {
   const [title, setTitle] = useState("");
@@ -10,6 +11,9 @@ export default function CreatePost() {
   const [price, setPrice] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -21,19 +25,59 @@ export default function CreatePost() {
 
   const removeTag = (t) => setTags(tags.filter((tag) => tag !== t));
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/owner/post", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, amount, price, tags }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert("✅ Post created successfully!");
-      router.push(`/owner/post/show/${data._id}`);
-    } else {
-      alert("❌ Error: " + data.error);
+
+    if (!title || !description || !amount || !price) {
+      alert("Please fill all the fields");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      
+      // Upload image to Supabase if available
+      let imageData = null;
+      if (imageFile) {
+        imageData = await uploadProductImage(imageFile);
+      }
+
+      const res = await fetch("/api/owner/post", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          amount,
+          price,
+          tags,
+          image: imageData,
+        }),
+      });
+
+      if (res.ok) {
+        router.push("/owner/post");
+      } else {
+        throw new Error("Failed to create a post");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -87,6 +131,28 @@ export default function CreatePost() {
             required
             className={`w-1/2 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
           />
+        </div>
+        
+        {/* Image Upload */}
+        <div className="mb-4">
+          <label className={`block text-sm font-medium mb-2 ${theme.text}`}>
+            Product Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          />
+          {imagePreview && (
+            <div className="mt-2">
+              <img 
+                src={imagePreview} 
+                alt="Preview" 
+                className="h-40 object-contain border rounded-lg"
+              />
+            </div>
+          )}
         </div>
 
         {/* Tags */}
