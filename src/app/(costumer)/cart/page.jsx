@@ -221,7 +221,7 @@ export default function CartPage() {
               <div key={item._id} className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">
                   <img 
-                    src={item.image || "/logo.svg"} 
+                    src={item.imageUrl || "/logo.svg"} 
                     alt={item.name} 
                     className="w-16 h-16 object-cover rounded"
                   />

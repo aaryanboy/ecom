@@ -10,81 +10,48 @@ const getBaseUrl = () => {
   return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 };
 
-// eSewa credentials and endpoints from environment variables
+// eSewa credentials and endpoints
 const ESEWA_MERCHANT_ID = process.env.ESEWA_MERCHANT_ID || "EPAYTEST";
 const ESEWA_SECRET_KEY = process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q";
 const ESEWA_SUCCESS_URL = `${getBaseUrl()}/api/payment/verify`;
 const ESEWA_FAILURE_URL = `${getBaseUrl()}/cart?payment=failed`;
 
-// eSewa API endpoint from environment variables
-const ESEWA_API_URL = process.env.ESEWA_API_URL || "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+// New eSewa API endpoint
+const ESEWA_API_URL = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
 
 export async function POST(req) {
   try {
-    console.log("==================== CHECKOUT PROCESS STARTED ====================");
     await connectToDatabase();
-    console.log("Database connection established");
 
     const { userId } = await req.json();
 
     if (!userId) {
-      console.error("ERROR: User ID is missing in checkout request");
       return NextResponse.json(
         { success: false, message: 'User ID is required' },
         { status: 400 }
       );
     }
-    
-    console.log(`Processing checkout for user: ${userId}`);
 
     // Find user's cart and populate product details
     const cart = await Cart.findOne({ userId }).populate('items.productId');
     
-    if (!cart) {
-      console.error(`ERROR: Cart not found for user: ${userId}`);
-      return NextResponse.json(
-        { success: false, message: 'Cart not found' },
-        { status: 400 }
-      );
-    }
-    
-    if (cart.items.length === 0) {
-      console.error(`ERROR: Cart is empty for user: ${userId}`);
+    if (!cart || cart.items.length === 0) {
       return NextResponse.json(
         { success: false, message: 'Cart is empty' },
         { status: 400 }
       );
     }
-    
-    console.log(`Cart found with ${cart.items.length} items`);
 
     // Calculate total amount
     let totalAmount = 0;
-    const itemDetails = [];
-    
     cart.items.forEach(item => {
       if (item.productId && item.productId.price) {
-        const itemTotal = item.productId.price * item.quantity;
-        totalAmount += itemTotal;
-        
-        itemDetails.push({
-          id: item.productId._id.toString(),
-          name: item.productId.name,
-          price: item.productId.price,
-          quantity: item.quantity,
-          total: itemTotal
-        });
-      } else {
-        console.warn("WARNING: Item without productId found in cart");
+        totalAmount += item.productId.price * item.quantity;
       }
     });
-    
-    console.log("Cart items:", JSON.stringify(itemDetails));
-    console.log(`Total amount calculated: ${totalAmount}`);
 
     // Generate a unique transaction UUID with userId for verification
     const transactionUuid = `${Date.now()}-${uuidv4()}-${userId}`;
-    console.log(`Generated transaction UUID: ${transactionUuid}`);
     
     // Format the amount as a string with 2 decimal places
     const formattedAmount = totalAmount.toFixed(2);
@@ -102,33 +69,18 @@ export async function POST(req) {
       failure_url: ESEWA_FAILURE_URL,
       signed_field_names: "total_amount,transaction_uuid,product_code",
     };
-    
-    console.log(`Using eSewa configuration:
-      - Merchant ID: ${ESEWA_MERCHANT_ID}
-      - API URL: ${ESEWA_API_URL}
-      - Success URL: ${ESEWA_SUCCESS_URL}
-      - Failure URL: ${ESEWA_FAILURE_URL}
-      - Secret Key: ${ESEWA_SECRET_KEY ? '[HIDDEN]' : 'Not set'}`);
 
     // Create signature string
     const signatureString = `total_amount=${esewaConfig.total_amount},transaction_uuid=${esewaConfig.transaction_uuid},product_code=${esewaConfig.product_code}`;
-    console.log(`Signature string: ${signatureString}`);
     
     // Generate signature
     const signature = generateEsewaSignature(ESEWA_SECRET_KEY, signatureString);
-    console.log(`Generated signature: ${signature}`);
 
     // Create form data for submission
     const formData = {
       ...esewaConfig,
       signature,
     };
-    
-    console.log(`Payment parameters:
-      - Amount: ${formattedAmount}
-      - Transaction UUID: ${transactionUuid}
-      - Product Code: ${ESEWA_MERCHANT_ID}
-      - Signature: ${signature}`);
 
     // Create HTML form for automatic submission
     const htmlForm = `
@@ -169,16 +121,12 @@ export async function POST(req) {
             ).join('')}
           </form>
           <script>
-            console.log("Submitting form to eSewa...");
             document.getElementById("esewaForm").submit();
           </script>
         </body>
       </html>
     `;
 
-    console.log("Returning HTML form for eSewa payment submission");
-    console.log("==================== CHECKOUT PROCESS COMPLETED ====================");
-    
     // Return HTML response for automatic form submission
     return new NextResponse(htmlForm, {
       headers: {
@@ -186,14 +134,9 @@ export async function POST(req) {
       },
     });
   } catch (error) {
-    console.error('ERROR: Failed to process checkout:', error);
+    console.error('Error initiating checkout:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Failed to initiate checkout',
-        error: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      },
+      { success: false, message: 'Failed to initiate checkout' },
       { status: 500 }
     );
   }

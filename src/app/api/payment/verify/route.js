@@ -3,171 +3,154 @@ import { NextResponse } from "next/server";
 import Cart from "@/models/cart";
 import Payment from "@/models/Payment";
 import connectToDatabase from "@/lib/db";
+import { generateEsewaSignature } from "@/lib/generateEsewaSignature";
 
 // Get the base URL with correct port
 const getBaseUrl = () => {
+  // Check if we're in a browser environment
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  // Otherwise use environment variable or default
   return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 };
 
 export async function GET(req) {
   try {
-    console.log("==================== PAYMENT VERIFICATION START ====================");
-    console.log("Payment verification callback received at:", new Date().toISOString());
-    
+    console.log("Payment verification callback received");
+
+    const ESEWA_SECRET_KEY = process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q";
+
     // Extract parameters from the URL
     const url = new URL(req.url);
     console.log("Full URL:", url.toString());
-    
-    // Check if we have a data parameter (eSewa v2 API)
-    let transactionCode, status, transactionUuid, productCode, amount;
-    let esewaData = null;
-    
-    const dataParam = url.searchParams.get('data');
+    const searchParamsObj = Object.fromEntries(url.searchParams.entries());
+    console.log("Search params:", searchParamsObj);
+
+    // eSewa v2 sends a base64-encoded 'data' payload on success
+    const dataParam = url.searchParams.get("data");
+
+    let payload = null;
+    let transactionCode = null;
+    let status = null;
+    let transactionUuid = null;
+    let productCode = null;
+    let totalAmount = null;
+    let signedFieldNames = null;
+    let signature = null;
+
     if (dataParam) {
       try {
-        // Decode base64 data parameter
-        const decodedData = Buffer.from(dataParam, 'base64').toString('utf-8');
-        console.log("Decoded data:", decodedData);
-        
-        // Parse the JSON data
-        esewaData = JSON.parse(decodedData);
-        console.log("Parsed eSewa data:", esewaData);
-        
-        // Extract values from the parsed data
-        transactionCode = esewaData.transaction_code;
-        status = esewaData.status;
-        transactionUuid = esewaData.transaction_uuid;
-        productCode = esewaData.product_code;
-        amount = esewaData.total_amount;
-      } catch (error) {
-        console.error("ERROR: Failed to decode or parse data parameter:", error);
-        return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed&reason=invalid_data_format&error=${encodeURIComponent(error.message)}`);
+        const decoded = Buffer.from(dataParam, "base64").toString("utf-8");
+        payload = JSON.parse(decoded);
+        console.log("Decoded eSewa payload:", payload);
+
+        // Normalize fields from payload
+        transactionCode = payload.transaction_code || payload.refId || payload.reference_id || null;
+        status = payload.status || null; // Expected 'COMPLETE' or 'COMPLETED'
+        transactionUuid = payload.transaction_uuid || payload.oid || null;
+        productCode = payload.product_code || null;
+        totalAmount = payload.total_amount || payload.amount || null;
+        signedFieldNames = payload.signed_field_names || null;
+        signature = payload.signature || null;
+
+        // Verify required fields exist
+        if (!transactionCode || !transactionUuid || !signedFieldNames || !signature) {
+          console.log("Missing required fields in eSewa payload");
+          return NextResponse.redirect(`${getBaseUrl()}/cart?payment=invalid`);
+        }
+
+        // Build signature string based on signed_field_names order
+        const fields = signedFieldNames.split(",").map(f => f.trim()).filter(Boolean);
+        const valueMap = {
+          transaction_code: transactionCode,
+          status,
+          total_amount: totalAmount,
+          transaction_uuid: transactionUuid,
+          product_code: productCode,
+          signed_field_names: signedFieldNames,
+        };
+        const signatureString = fields.map((f) => `${f}=${valueMap[f] ?? ""}`).join(",");
+        const computedSignature = generateEsewaSignature(ESEWA_SECRET_KEY, signatureString);
+
+        if (computedSignature !== signature) {
+          console.log("Signature mismatch:", { signatureString, computedSignature, signature });
+          return NextResponse.redirect(`${getBaseUrl()}/cart?payment=invalid`);
+        }
+      } catch (err) {
+        console.error("Failed to decode/parse eSewa data payload:", err);
+        return NextResponse.redirect(`${getBaseUrl()}/cart?payment=invalid`);
       }
     } else {
-      // Fallback to direct URL parameters (old API)
+      // Fallback for older flows where params are directly in the query
       transactionCode = url.searchParams.get('transaction_code') || url.searchParams.get('refId');
-      status = url.searchParams.get('status') || 'COMPLETE'; // Default to COMPLETE for old API
+      status = url.searchParams.get('status') || null;
       transactionUuid = url.searchParams.get('transaction_uuid') || url.searchParams.get('oid');
       productCode = url.searchParams.get('product_code');
-      amount = url.searchParams.get('amount') || url.searchParams.get('amt');
+      totalAmount = url.searchParams.get('total_amount') || url.searchParams.get('amount') || url.searchParams.get('amt');
     }
-    
-    console.log("PAYMENT DETAILS:");
-    console.log("- Transaction Code:", transactionCode);
-    console.log("- Status:", status);
-    console.log("- Transaction UUID:", transactionUuid);
-    console.log("- Product Code:", productCode);
-    console.log("- Amount:", amount);
-    
-    // For eSewa v2 API, check if the status is success
-    if (status && status.toUpperCase() !== 'COMPLETE') {
-      console.error(`ERROR: Payment status is not complete: ${status}`);
-      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed&reason=incomplete_status&status=${status}`);
+
+    // Status check (accept 'COMPLETE' and 'COMPLETED')
+    const statusNormalized = (status || "").toUpperCase();
+    if (statusNormalized && statusNormalized !== "COMPLETE" && statusNormalized !== "COMPLETED") {
+      console.log("Payment status not complete:", statusNormalized);
+      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed`);
     }
-    
-    // Validate required parameters
-    if (!transactionUuid) {
-      console.error("ERROR: Transaction UUID is missing");
-      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=invalid&reason=missing_transaction_uuid`);
-    }
-    
-    // Extract email (userId) from the transaction UUID
-    // Format expected: timestamp-uuid-email@domain.com
+
+    // Extract userId (email) from transactionUuid suffix
     let userId = null;
-    
-    if (transactionUuid.includes('-')) {
-      // Get the part after the last dash
+    if (transactionUuid && transactionUuid.includes('-')) {
       const parts = transactionUuid.split('-');
-      const lastPart = parts[parts.length - 1];
-      
-      // Check if the last part is an email
-      if (lastPart && lastPart.includes('@')) {
-        userId = lastPart;
-        console.log("Extracted userId (email):", userId);
-      } else {
-        // Try to find any email pattern in the transaction UUID
-        const emailMatch = transactionUuid.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
-        if (emailMatch && emailMatch[1]) {
-          userId = emailMatch[1];
-          console.log("Extracted userId using regex:", userId);
+      if (parts.length >= 3) {
+        const candidate = parts[parts.length - 1];
+        if (candidate.includes('@')) {
+          userId = candidate;
+          console.log("Extracted userId from transaction UUID:", userId);
         }
       }
     }
-    
-    if (!userId) {
-      console.error("ERROR: Could not extract email from transaction UUID:", transactionUuid);
-      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed&reason=invalid_transaction_format`);
-    }
-    
-    // Connect to database
+
     await connectToDatabase();
-    
-    try {
-      console.log("Looking for cart with userId:", userId);
-      
-      // Get the cart items using the extracted email as userId
-      const cart = await Cart.findOne({ userId }).populate('items.productId');
-      
-      if (!cart) {
-        console.error(`ERROR: Cart not found for user: ${userId}`);
-        return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed&reason=cart_not_found`);
-      }
-      
-      console.log("Cart found for user");
-      let cartItems = [];
-      
-      if (cart.items && cart.items.length > 0) {
-        console.log(`Cart has ${cart.items.length} items`);
-        // Format cart items for storage
-        cartItems = cart.items.map(item => {
-          if (!item.productId) {
-            console.error(`ERROR: Product ID missing for cart item`);
-            return null;
-          }
-          return {
-            productId: item.productId._id,
-            name: item.productId.name || 'Unknown Product',
-            price: item.productId.price || 0,
-            quantity: item.quantity || 1
-          };
-        }).filter(item => item !== null);
-      } else {
-        console.warn("WARNING: Cart is empty, but proceeding with payment");
-      }
-      
-      // Store payment details in database
-      const paymentAmount = parseFloat(amount) || 
-        cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-      
-      console.log("Creating payment record with amount:", paymentAmount);
-      
-      const payment = await Payment.create({
-        userId,
-        transactionId: transactionCode,
-        amount: paymentAmount,
-        status: 'success',
-        paymentMethod: 'eSewa',
-        items: cartItems,
-      });
-      
-      console.log(`Payment details stored for transaction: ${transactionCode}`);
-      
-      // Clear the cart
-      console.log(`Clearing cart for user: ${userId}`);
-      await Cart.findOneAndUpdate(
-        { userId },
-        { $set: { items: [] } }
-      );
-      
-      console.log("Payment verification successful");
-      console.log("==================== PAYMENT VERIFICATION SUCCESS ====================");
-      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=success&ref=${transactionCode}&cleared=true`);
-    } catch (dbError) {
-      console.error('ERROR: Database operation failed during payment verification:', dbError);
-      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed&reason=database_error&error=${encodeURIComponent(dbError.message)}`);
+
+    if (!userId) {
+      console.log("Could not extract userId from transaction UUID, redirecting to success page");
+      return NextResponse.redirect(`${getBaseUrl()}/cart?payment=success&ref=${transactionCode}`);
     }
+
+    const cart = await Cart.findOne({ userId }).populate('items.productId');
+    let cartItems = [];
+    let computedCartTotal = 0;
+
+    if (cart && cart.items && cart.items.length > 0) {
+      cartItems = cart.items.map(item => ({
+        productId: item.productId?._id,
+        name: item.productId?.title,
+        price: item.productId?.price || 0,
+        quantity: item.quantity || 1,
+      }));
+      computedCartTotal = cartItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    }
+
+    const amountToStore = parseFloat(totalAmount) || parseFloat(payload?.amount) || computedCartTotal;
+
+    await Payment.create({
+      userId,
+      transactionId: transactionCode,
+      amount: amountToStore,
+      status: 'success',
+      paymentMethod: 'eSewa',
+      items: cartItems,
+    });
+
+    console.log(`Payment details stored for transaction: ${transactionCode}`);
+
+    console.log(`Clearing cart for user: ${userId}`);
+    await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+
+    console.log("Payment successful, redirecting to success page");
+    return NextResponse.redirect(`${getBaseUrl()}/cart?payment=success&ref=${transactionCode}&cleared=true`);
   } catch (error) {
-    console.error('ERROR: Payment verification failed with exception:', error);
-    return NextResponse.redirect(`${getBaseUrl()}/cart?payment=error&error=${encodeURIComponent(error.message)}`);
+    console.error('Error verifying payment:', error);
+    return NextResponse.redirect(`${getBaseUrl()}/cart?payment=error`);
   }
 }

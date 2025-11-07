@@ -31,12 +31,16 @@ export default function Dashboard() {
   }, []);
 
   if (loading) {
-    return <div className="text-cyan-50">Loading...</div>;
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${theme.background} ${theme.text}`}>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
-    <div className={`text-cyan-50 p-6`}>
-      <h1 className="text-3xl font-bold mb-4">Dashsboard</h1>
+    <div className={`min-h-screen ${theme.background} ${theme.text} p-6`}>
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
       {user ? (
         <div className="space-y-3">
@@ -53,20 +57,19 @@ export default function Dashboard() {
             <div className="mt-6 p-4 bg-cyan-900/30 rounded-lg">
               <h2 className="text-xl font-semibold mb-2">Owner Controls</h2>
               <p>You have access to admin tools and management features.</p>
-              <button className="mt-3 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded">
+              <button className={`mt-3 px-4 py-2 rounded ${theme.button} ${theme.buttonHover}`}>
                 Manage Store
               </button>
             </div>
           )}
         </div>
       ) : (
-        <p className="text-red-400">Not logged in</p>
+        <p className={`${theme.danger}`}>Not logged in</p>
       )}
-
-      <div className="mt-10">
+    
+      <div className={`mt-10 rounded-xl p-4 shadow ${theme.card}`}>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga
-          praesentium quae pariatur officia sint exercitationem vitae sequi dolore.
+          Welcome back! Track your orders and explore new products.
         </p>
       </div>
     </div>

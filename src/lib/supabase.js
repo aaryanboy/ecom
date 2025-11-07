@@ -5,18 +5,25 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// Avoid throwing at import time; log a warning if missing
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  // In development, missing envs can break import; keep module loadable
+  console.warn('Supabase environment variables are missing. Client operations will fail until configured.');
 }
 
 // Client for browser usage (with anonymous key)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 // Create a separate admin client for server-side operations
 // This will only be used in server components or API routes
 export const createAdminClient = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase server environment variables');
+  }
   return createClient(supabaseUrl, supabaseServiceKey);
 };
 
@@ -31,15 +38,27 @@ export const STORAGE_BUCKET = 'images';
  */
 export async function uploadProductImage(file, fileName) {
   try {
-    // Create a unique file name to avoid collisions
-    const uniqueFileName = `${Date.now()}-${fileName}`;
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Check environment variables.');
+      return null;
+    }
+    // Create a numeric-only base name to simplify storage/search
+    const timestamp = Date.now();
+    const rand = Math.floor(Math.random() * 1e9);
+    const numericBase = `${timestamp}${rand}`; // e.g., 1730797923456123456789
+
+    // Preserve extension if available (from fileName), but base stays numeric
+    const extMatch = (fileName || '').match(/\.([a-zA-Z0-9]+)$/);
+    const ext = extMatch ? `.${extMatch[1]}` : '';
+    const uniqueFileName = `${numericBase}${ext}`;
     
     // Upload the file to the product-images bucket
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(uniqueFileName, file, {
         cacheControl: '3600',
-        upsert: false
+        upsert: false,
+        contentType: file?.type || 'image/jpeg',
       });
     
     if (error) {
@@ -69,6 +88,10 @@ export async function uploadProductImage(file, fileName) {
  */
 export async function deleteProductImage(filePath) {
   try {
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Check environment variables.');
+      return false;
+    }
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
       .remove([filePath]);

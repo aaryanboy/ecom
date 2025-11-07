@@ -30,7 +30,9 @@ export async function GET(request) {
       _id: item._id,
       name: item.productId?.title || 'Product Not Available',
       price: item.productId?.price || 0,
-      image: item.productId?.image || '/logo.svg',
+      imageUrl: item.productId?.imageUrl || '/logo.svg',
+      // keep legacy 'image' field for compatibility
+      image: item.productId?.imageUrl || '/logo.svg',
       quantity: item.quantity
     }));
 

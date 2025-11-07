@@ -20,7 +20,7 @@ const ThemeDropdown = () => {
           src={isDark ? "/moon-light.svg" : "/sun.svg"}
           alt={isDark ? "Dark Mode" : "Light Mode"}
           width={15}
-          height={15}
+          height={10}
         />
       </button>
 
@@ -41,7 +41,7 @@ const ThemeDropdown = () => {
               src={isDark ? "/sun-light.svg" : "/sun.svg"} // <-- dynamic
               alt="Light Mode"
               width={14}
-              height={14}
+              height={24}
             />
             <span className={`${theme.text} text-xs  `}>LigntMode</span>
           </div>

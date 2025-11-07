@@ -49,13 +49,6 @@ export default function ShowPosts() {
       className={`grid grid-cols-12 gap-4 px-6 py-4 border-b cursor-pointer hover:shadow-md transition ${theme.card} ${theme.border}`}
       onClick={() => router.push(`/owner/post/show/${post._id}`)}
     >
-      {post.image?.url && (
-        <img
-          src={post.image.url}
-          alt={post.title}
-          className="w-full h-64 object-cover"
-        />
-      )}
       {/* Item Details Column */}
       <div className="col-span-4">
         <h3 className="text-lg font-semibold">{post.title}</h3>
@@ -118,6 +111,30 @@ export default function ShowPosts() {
           className={`px-3 py-2 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
         >
           👁️ View
+        </button>
+        <button
+          onClick={async (e) => {
+            e.stopPropagation();
+            const confirmed = confirm("Are you sure you want to delete this post? This will also remove its image.");
+            if (!confirmed) return;
+            try {
+              const res = await fetch(`/api/owner/post?id=${post._id}`, { method: "DELETE" });
+              const data = await res.json();
+              if (res.ok && data.ok) {
+                alert("🗑️ Post deleted successfully");
+                // Optimistically remove from list
+                setPosts((prev) => prev.filter((p) => p._id !== post._id));
+              } else {
+                alert("❌ Failed to delete post");
+              }
+            } catch (err) {
+              console.error("Error deleting post:", err);
+              alert("❌ Error deleting post");
+            }
+          }}
+          className={`px-3 py-2 rounded-lg font-medium transition bg-red-600 text-white hover:bg-red-700`}
+        >
+          🗑️ Delete
         </button>
       </div>
     </div>

@@ -12,12 +12,9 @@ export default function ShowPost() {
 
   useEffect(() => {
     if (!id) return;
-    fetch("/api/owner/post")
+    fetch(`/api/post/${id}`)
       .then((res) => res.json())
-      .then((data) => {
-        const found = data.find((p) => p._id === id);
-        setPost(found);
-      })
+      .then((data) => setPost(data))
       .catch((err) => console.error("Error fetching post:", err))
       .finally(() => setLoading(false));
   }, [id]);
@@ -46,67 +43,22 @@ export default function ShowPost() {
       </div>
     );
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const handleDelete = async () => {
-    if (deleting) return;
-    
-    setDeleting(true);
-    try {
-      const response = await fetch(`/api/owner/post?id=${post._id}`, {
-        method: 'DELETE',
-      });
-      
-      if (response.ok) {
-        router.push('/owner/post');
-      } else {
-        const error = await response.json();
-        alert(`Failed to delete: ${error.error || 'Unknown error'}`);
-      }
-    } catch (err) {
-      alert(`Error: ${err.message}`);
-    } finally {
-      setDeleting(false);
-      setShowDeleteModal(false);
-    }
-  };
-
   return (
     <div
       className={`min-h-screen flex justify-center items-center p-6 ${theme.background} ${theme.text}`}
     >
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`p-6 rounded-lg shadow-lg max-w-md w-full ${theme.card}`}>
-            <h3 className="text-xl font-bold mb-4">Confirm Delete</h3>
-            <p className="mb-6">Are you sure you want to delete "{post.title}"? This action cannot be undone.</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className={`flex-1 py-2 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
-                disabled={deleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 py-2 rounded-lg font-medium transition bg-red-500 hover:bg-red-600 text-white"
-                disabled={deleting}
-              >
-                {deleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div
         className={`max-w-2xl w-full p-8 rounded-2xl shadow-lg border ${theme.card} ${theme.border}`}
       >
         <h2 className="text-3xl font-bold mb-4">{post.title}</h2>
         <p className={`mb-4 ${theme.secondaryText}`}>{post.description}</p>
-
+        {post.imageUrl && (
+          <img
+            src={post.imageUrl}
+            alt={post.title}
+            className="w-full h-64 object-cover rounded-lg border mb-6"
+          />
+        )}
         <div className="text-sm mb-6 space-y-1">
           <p>
             <span className="font-medium">Amount:</span> {post.amount}
@@ -138,12 +90,6 @@ export default function ShowPost() {
             className={`flex-1 py-2 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
           >
             ✏️ Edit
-          </button>
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="flex-1 py-2 rounded-lg font-medium transition bg-red-500 hover:bg-red-600 text-white"
-          >
-            🗑️ Delete
           </button>
           <button
             onClick={() => router.push(`/owner/post`)}

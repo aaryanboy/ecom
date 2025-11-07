@@ -33,14 +33,12 @@ export async function POST(req) {
     return NextResponse.json(
       { message: "User stored successfully",  
         data: {
-        username: newUser.username,
-        email: newUser.email,
-        isOwner: newUser.isOwner,
-        addresses: newUser.addresses,
-        cart: newUser.cart,
-        wishlist: newUser.wishlist,
-        orders: newUser.orders
-      } },
+          username: newUser.username,
+          email: newUser.email,
+          isOwner: newUser.isOwner,
+          addresses: newUser.addresses
+        } 
+      },
       { status: 201 }
     );
 

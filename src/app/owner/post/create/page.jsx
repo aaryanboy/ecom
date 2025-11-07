@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import { uploadProductImage } from "@/lib/supabase";
 
 export default function CreatePost() {
   const [title, setTitle] = useState("");
@@ -12,8 +11,6 @@ export default function CreatePost() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -25,59 +22,42 @@ export default function CreatePost() {
 
   const removeTag = (t) => setTags(tags.filter((tag) => tag !== t));
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let imagePath = null;
+    let imageUrl = null;
 
-    if (!title || !description || !amount || !price) {
-      alert("Please fill all the fields");
-      return;
+    // Upload image if provided
+    if (imageFile) {
+      try {
+        const fd = new FormData();
+        fd.append("file", imageFile);
+        fd.append("fileName", imageFile.name);
+        const res = await fetch("/api/media/upload", { method: "POST", body: fd });
+        const uploaded = await res.json();
+        if (!res.ok || !uploaded?.ok) {
+          throw new Error(uploaded?.error || "Upload failed");
+        }
+        imagePath = uploaded.path;
+        imageUrl = uploaded.url;
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert("❌ Failed to upload image. Please try again.");
+        return;
+      }
     }
 
-    try {
-      setUploading(true);
-      
-      // Upload image to Supabase if available
-      let imageData = null;
-      if (imageFile) {
-        imageData = await uploadProductImage(imageFile);
-      }
-
-      const res = await fetch("/api/owner/post", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          amount,
-          price,
-          tags,
-          image: imageData,
-        }),
-      });
-
-      if (res.ok) {
-        router.push("/owner/post");
-      } else {
-        throw new Error("Failed to create a post");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setUploading(false);
+    const res = await fetch("/api/owner/post", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, amount, price, tags, imagePath, imageUrl }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert("✅ Post created successfully!");
+      router.push(`/owner/post/show/${data._id}`);
+    } else {
+      alert("❌ Error: " + data.error);
     }
   };
 
@@ -132,27 +112,16 @@ export default function CreatePost() {
             className={`w-1/2 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
           />
         </div>
-        
+
         {/* Image Upload */}
         <div className="mb-4">
-          <label className={`block text-sm font-medium mb-2 ${theme.text}`}>
-            Product Image
-          </label>
+          <label className="block mb-2 font-medium">Product Image</label>
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
           />
-          {imagePreview && (
-            <div className="mt-2">
-              <img 
-                src={imagePreview} 
-                alt="Preview" 
-                className="h-40 object-contain border rounded-lg"
-              />
-            </div>
-          )}
         </div>
 
         {/* Tags */}

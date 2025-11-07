@@ -5,8 +5,8 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  isOwner: { type: Boolean, required: true,default: false },   // owner/admin flag
-  sessionToken: { type: String, default: null }, // store session token
+  isOwner: { type: Boolean, required: true, default: false },
+  sessionToken: { type: String, default: null },
 
   // Profile info
   firstName: String,
@@ -28,19 +28,8 @@ const UserSchema = new mongoose.Schema({
     }
   ],
 
-  // Cart & Wishlist
-  cart: [
-    { productId: mongoose.Schema.Types.ObjectId, quantity: Number, addedAt: { type: Date, default: Date.now } }
-  ],
-  wishlist: [
-    { productId: mongoose.Schema.Types.ObjectId, addedAt: { type: Date, default: Date.now } }
-  ],
-
-  // Orders
-  orders: [
-    { orderId: mongoose.Schema.Types.ObjectId, status: String, purchasedAt: Date }
-  ]
-
+  // Recommendations
+  tagPreferences: { type: [String], default: [] },
 }, { timestamps: true });
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema);

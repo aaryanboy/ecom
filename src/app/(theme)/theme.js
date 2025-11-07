@@ -1,20 +1,24 @@
 // App/theme.js
 export const lightTheme = {
-    background: "bg-gray-50",       // main page background
-    navbar: "bg-white",
-    sidebar: "bg-neutral-200",
-    card: "bg-white",
-    modal: "bg-white",
-    button: "bg-black text-white",
-    buttonHover: "hover:bg-gray-800",
-    buttonActive: "bg-blue-700",
-    buttonText: "text-white",
-    link: "text-blue-600",
-    text: "text-gray-900",
-    textHover: "hover:text-white",
-    secondaryText: "text-gray-700",
-    border: "border-gray-200",
-  };
+  background: "bg-slate-50",
+  navbar: "bg-white",
+  sidebar: "bg-slate-200",
+  card: "bg-white",
+  modal: "bg-white",
+  button: "bg-blue-600 text-white",
+  buttonHover: "hover:bg-blue-700",
+  buttonActive: "bg-blue-800",
+  buttonText: "text-white",
+  link: "text-blue-600",
+  text: "text-slate-900",
+  textHover: "hover:text-slate-700",
+  secondaryText: "text-slate-700",
+  border: "border-slate-200",
+  success: "text-green-600",
+  danger: "text-red-600",
+  mutedText: "text-slate-500",
+  chip: "bg-slate-100",
+};
   
   export const darkTheme = {
     background: "bg-black",
@@ -31,5 +35,9 @@ export const lightTheme = {
     textHover: "",
     secondaryText: "text-gray-300",
     border: "border-gray-600",
+    success: "text-green-400",
+    danger: "text-red-400",
+    mutedText: "text-gray-400",
+    chip: "bg-neutral-800",
   };
   

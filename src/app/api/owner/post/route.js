@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db";
 import Post from "@/models/Post";
+import User from "@/models/User";
+import { createAdminClient, STORAGE_BUCKET } from "@/lib/supabase";
 
 // CREATE
 export async function POST(req) {
   await connectToDatabase();
   try {
-    const { title, description, amount, price, tags, image } = await req.json();
-    const post = await Post.create({
-      title,
-      description,
-      amount,
-      price,
-      tags,
-      image,
-    });
+    const sessionToken = req.cookies.get("session")?.value;
+    const user = sessionToken ? await User.findOne({ sessionToken }) : null;
+    if (!user || !user.isOwner) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const body = await req.json();
+    const post = await Post.create(body);
     return NextResponse.json(post, { status: 201 });
   } catch (err) {
     console.error("Create error:", err);
@@ -22,60 +22,84 @@ export async function POST(req) {
   }
 }
 
-// GET ALL POSTS
-export async function GET() {
+// GET ALL POSTS (supports pagination via page & limit)
+export async function GET(req) {
   await connectToDatabase();
-  const posts = await Post.find();
-  return NextResponse.json(posts);
+  try {
+    const { searchParams } = new URL(req.url);
+    const pageParam = searchParams.get("page");
+    const limitParam = searchParams.get("limit");
+
+    // If page & limit provided, return paginated shape { posts, total, page, limit }
+    if (pageParam && limitParam) {
+      const page = parseInt(pageParam) || 1;
+      const limit = parseInt(limitParam) || 10;
+      const skip = (page - 1) * limit;
+    
+      const [posts, total] = await Promise.all([
+        Post.find({}).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit).lean(),
+        Post.countDocuments({}),
+      ]);
+    
+      return NextResponse.json({ posts, total, page, limit });
+    }
+
+    // Backward-compatible: no pagination -> return full list (array)
+    const posts = await Post.find().lean();
+    return NextResponse.json(posts);
+  } catch (err) {
+    console.error("Fetch posts error:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
 
 // UPDATE (PUT)
 export async function PUT(req) {
   await connectToDatabase();
-  try {
-    const body = await req.json();
-    const { _id, ...updateData } = body;
-    
-    // Ensure image data is properly handled
-    if (updateData.image) {
-      // Make sure image data is properly structured
-      if (typeof updateData.image === 'object' && updateData.image !== null) {
-        // Image data is already in the correct format
-      } else {
-        // Remove invalid image data
-        delete updateData.image;
-      }
-    }
-    
-    const post = await Post.findByIdAndUpdate(_id, updateData, { new: true });
-    return NextResponse.json(post);
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  const sessionToken = req.cookies.get("session")?.value;
+  const user = sessionToken ? await User.findOne({ sessionToken }) : null;
+  if (!user || !user.isOwner) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  const { id, ...data } = await req.json();
+  const updated = await Post.findByIdAndUpdate(id, data, { new: true });
+  return NextResponse.json(updated);
 }
 
+// DELETE
 export async function DELETE(req) {
   await connectToDatabase();
-  try {
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
-    
-    if (!id) {
-      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
-    }
-    
-    // Find the post to get image info before deleting
-    const post = await Post.findById(id);
-    if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
-    }
-    
-    // Delete the post from the database
-    await Post.findByIdAndDelete(id);
-    
-    // Return success response
-    return NextResponse.json({ message: 'Post deleted successfully' });
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  const sessionToken = req.cookies.get("session")?.value;
+  const user = sessionToken ? await User.findOne({ sessionToken }) : null;
+  if (!user || !user.isOwner) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  const post = await Post.findById(id);
+  if (!post) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Delete image from Supabase Storage if present
+  if (post.imagePath) {
+    try {
+      const admin = createAdminClient();
+      const { error } = await admin.storage
+        .from(STORAGE_BUCKET)
+        .remove([post.imagePath]);
+      if (error) {
+        console.error("Error deleting image from storage:", error);
+      }
+    } catch (err) {
+      console.error("Storage removal error:", err);
+    }
+  }
+
+  await Post.findByIdAndDelete(id);
+  return NextResponse.json({ ok: true });
 }
