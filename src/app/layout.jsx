@@ -1,8 +1,9 @@
 import "./globals.css";
 import { ThemeProvider } from "./(theme)/ThemeContext";
-import  Header  from "@/components/Header";
+import Header from "@/components/Header";
 import ThemeWrapper from "./(theme)/ThemeWrapper";
-import { AuthProvider } from "./(auth)/AuthContext"; // ✅ import
+import { AuthProvider } from "./(auth)/AuthContext";
+import FooterSuggested from "@/components/FooterSuggested";
 
 export default function RootLayout({ children }) {
   return (
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
                 <Header />
                 <main className="pt-20 flex-1">{children}</main>
               </div>
+              <FooterSuggested />
             </AuthProvider>
           </ThemeWrapper>
         </ThemeProvider>
