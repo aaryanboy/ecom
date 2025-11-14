@@ -16,19 +16,16 @@ const Header = () => {
 
   const loggedOutLinks = [
     { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Customer Support", path: "/support" },
-    { name: "New Arrivals", path: "/new-arrivals" },
-    { name: "Location", path: "/location" },
+   
+    
+   
+   
     { name: "Contact", path: "/contact" },
   ];
 
   const customerLinks = [
     { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Customer Support", path: "/support" },
-    { name: "New Arrivals", path: "/new-arrivals" },
-    { name: "Location", path: "/location" },
+   
     { name: "Cart", path: "/cart" },
     { name: "Contact", path: "/contact" },
     { name: "For You", path: "/for-you" } // add this

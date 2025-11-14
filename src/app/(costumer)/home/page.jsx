@@ -30,7 +30,7 @@ export default function Home() {
   const categories = ["mounts", "hoodies", "shirts", "still-water", "cables"];
 
   return (
-    <div className={`min-h-screen ${theme.background} ${theme.text} p-6`}>
+    <div className={`min-h-screen ${theme.background} ${theme.text} px-2 py-6`}>
       <h1 className="text-3xl font-bold mb-8 text-center">Welcome to MyShop</h1>
 
       <div className="space-y-12">

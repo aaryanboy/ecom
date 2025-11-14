@@ -79,23 +79,25 @@ export default function ProductList() {
   }
 
   return (
-    <div className={`max-w-6xl mx-auto p-6 ${theme.text}`}>
+    <div className={`max-w-screen-2xl mx-auto px-2 ${theme.text}`}>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">All Products</h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
         {products.map((product) => (
           <div
             key={product._id}
             className={`border rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer ${theme.card} ${theme.border}`}
             onClick={() => router.push(`/product/${product._id}`)}
           >
-            <img
-              src={product.imageUrl || imagee}
-              alt={product.title}
-              className="w-full h-48 object-cover"
-            />
+            <div className="relative w-full pb-[100%] bg-white">
+              <img
+                src={product.imageUrl || imagee}
+                alt={product.title}
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            </div>
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-2 line-clamp-1">{product.title}</h3>
               <p className={`${theme.mutedText} text-sm mb-3 line-clamp-2`}>{product.description}</p>

@@ -86,7 +86,7 @@ export default function ForYouPreview() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-screen-2xl mx-auto px-2">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold">For You</h2>
         <div className="relative">
@@ -128,18 +128,20 @@ export default function ForYouPreview() {
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       ) : products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-5 gap-4">
           {products.map((product) => (
             <div
               key={product._id}
               className={`border rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer ${theme.card} ${theme.border}`}
               onClick={() => handleProductClick(product._id)}
             >
-              <img
-                src={product.imageUrl || imagee}
-                alt={product.title}
-                className="w-full h-48 object-cover"
-              />
+              <div className="relative w-full pb-[100%] bg-white">
+                <img
+                  src={product.imageUrl || imagee}
+                  alt={product.title}
+                  className="absolute inset-0 w-full h-full object-contain"
+                />
+              </div>
               <div className="p-3">
                 <h3 className="text-base font-semibold mb-1 line-clamp-1">{product.title}</h3>
                 <p className={`${theme.mutedText} text-xs mb-2 line-clamp-2`}>{product.description}</p>

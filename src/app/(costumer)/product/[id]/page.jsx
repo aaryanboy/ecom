@@ -50,12 +50,14 @@ export default function ProductDetail() {
       </button>
 
       <div className="flex flex-col md:flex-row gap-8 items-start">
-        <div className={`w-full md:w-1/2 rounded-2xl overflow-hidden shadow-md ${theme.card}`}>
-          <img
-            src={product.imageUrl || imagee}
-            alt={product.title}
-            className="w-full h-[400px] object-cover"
-          />
+        <div className={`w-full md:w-1/2 shadow-md ${theme.card}`}>
+          <div className="relative w-full pb-[100%] bg-white">
+            <img
+              src={product.imageUrl || imagee}
+              alt={product.title}
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+          </div>
         </div>
 
         <div className="flex-1">

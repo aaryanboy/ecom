@@ -64,16 +64,19 @@ export default function CategorizedProducts({ tag }) {
             className={`border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer ${theme.card} ${theme.border}`}
             onClick={() => handleProductClick(product._id)}
           >
-            <img
-              src={product.image || imagee}
-              alt={product.title}
-              className="w-full h-48 object-cover"
-            />
+            <div className="relative w-full pb-[100%] bg-white">
+              <img
+                src={product.imageUrl || imagee}
+                alt={product.title}
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            </div>
 
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
               <p className={`${theme.mutedText} text-sm mb-3 line-clamp-2`}>
                 {product.description}
+              
               </p>
               {product.price && (
                 <p className={`${theme.success} font-bold`}>
