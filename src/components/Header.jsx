@@ -28,7 +28,6 @@ const Header = () => {
    
     { name: "Cart", path: "/cart" },
     { name: "Contact", path: "/contact" },
-    { name: "For You", path: "/for-you" } // add this
   ];
 
   const ownerLinks = [

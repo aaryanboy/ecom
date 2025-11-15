@@ -29,7 +29,6 @@ const UserSchema = new mongoose.Schema({
   ],
 
   // Recommendations
-  tagPreferences: { type: [String], default: [] },
 }, { timestamps: true });
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema);

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import CategorizedProducts from "@/components/CategorizedProducts";
 import ProductList from "@/components/Products";
-import ForYouPreview from "@/components/ForYouPreview";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -36,9 +35,6 @@ export default function Home() {
       <div className="space-y-12">
         {/* All Products section */}
         <ProductList />
-
-        {/* For You preview section */}
-        <ForYouPreview />
 
         {/* Category sections */}
         {categories.map((category) => (

@@ -3,20 +3,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
-async function trackClick(productId) {
-  try {
-    await fetch("/api/track-click", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ productId }),
-    });
-  } catch (error) {
-    console.error("Error tracking click:", error);
-  }
-}
-
 export default function CategorizedProducts({ tag }) {
   const router = useRouter();
   const { theme } = useTheme();
@@ -49,7 +35,6 @@ export default function CategorizedProducts({ tag }) {
   }
 
   const handleProductClick = (productId) => {
-    trackClick(productId);
     router.push(`/product/${productId}`);
   };
 
