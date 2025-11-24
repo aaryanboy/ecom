@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import { addToCart, buyNow } from "@/lib/addToCart"; // 👈 import from lib
+import { addToCart, buyNow } from "@/lib/addToCart";
 import ConfirmModal from "@/components/ConfirmModal";
+import Similar from "@/components/Similar";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -117,6 +118,7 @@ export default function ProductDetail() {
           />
         </div>
       </div>
+      <Similar productId={product._id} tags={product.tags || []} />
     </div>
   );
 }
