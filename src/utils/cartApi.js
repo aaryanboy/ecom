@@ -17,6 +17,16 @@ export async function removeCartItemApi(userId, itemId) {
   return true;
 }
 
+export async function updateCartItemApi(userId, itemId, quantity) {
+  const res = await fetch('/api/cart/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, itemId, quantity })
+  });
+  if (!res.ok) throw new Error('Failed to update item');
+  return (await res.json()).cart;
+}
+
 export async function checkoutApi(userId) {
   const res = await fetch('/api/cart/checkout', {
     method: 'POST',
@@ -24,5 +34,15 @@ export async function checkoutApi(userId) {
     body: JSON.stringify({ userId })
   });
   if (!res.ok) throw new Error('Failed to initiate checkout');
+  return res.text();
+}
+
+export async function buyNowCheckoutApi(userId, productId, quantity) {
+  const res = await fetch('/api/checkout/buynow', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, productId, quantity })
+  });
+  if (!res.ok) throw new Error('Failed to initiate buy-now checkout');
   return res.text();
 }

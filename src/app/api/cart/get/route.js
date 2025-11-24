@@ -31,9 +31,10 @@ export async function GET(request) {
       name: item.productId?.title || 'Product Not Available',
       price: item.productId?.price || 0,
       imageUrl: item.productId?.imageUrl || '/logo.svg',
-      // keep legacy 'image' field for compatibility
       image: item.productId?.imageUrl || '/logo.svg',
-      quantity: item.quantity
+      quantity: item.quantity,
+      stock: item.productId?.amount ?? 0,
+      productId: item.productId?._id,
     }));
 
     return NextResponse.json({

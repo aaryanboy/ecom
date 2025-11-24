@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import Cart from "@/models/cart";
 import Payment from "@/models/Payment";
+import Post from "@/models/Post";
 import connectToDatabase from "@/lib/db";
 import { generateEsewaSignature } from "@/lib/generateEsewaSignature";
 
@@ -97,15 +98,21 @@ export async function GET(req) {
       return NextResponse.redirect(`${getBaseUrl()}/cart?payment=failed`);
     }
 
-    // Extract userId (email) from transactionUuid suffix
+    // Extract userId (email) and optional buy-now metadata from transactionUuid
     let userId = null;
-    if (transactionUuid && transactionUuid.includes('-')) {
-      const parts = transactionUuid.split('-');
-      if (parts.length >= 3) {
-        const candidate = parts[parts.length - 1];
-        if (candidate.includes('@')) {
-          userId = candidate;
-          console.log("Extracted userId from transaction UUID:", userId);
+    let buyNowProductId = null;
+    let buyNowQty = null;
+    if (transactionUuid) {
+      const afterLastDash = transactionUuid.split('-').pop();
+      const [emailPart, ...metaParts] = afterLastDash.split('|');
+      if (emailPart && emailPart.includes('@')) {
+        userId = emailPart;
+        console.log("Extracted userId from transaction UUID:", userId);
+      }
+      if (metaParts.length) {
+        for (const m of metaParts) {
+          if (m.startsWith('pid:')) buyNowProductId = m.replace('pid:', '');
+          if (m.startsWith('qty:')) buyNowQty = parseInt(m.replace('qty:', ''), 10);
         }
       }
     }
@@ -117,18 +124,26 @@ export async function GET(req) {
       return NextResponse.redirect(`${getBaseUrl()}/cart?payment=success&ref=${transactionCode}`);
     }
 
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
-    let cartItems = [];
+    let purchaseItems = [];
     let computedCartTotal = 0;
 
-    if (cart && cart.items && cart.items.length > 0) {
-      cartItems = cart.items.map(item => ({
-        productId: item.productId?._id,
-        name: item.productId?.title,
-        price: item.productId?.price || 0,
-        quantity: item.quantity || 1,
-      }));
-      computedCartTotal = cartItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    if (buyNowProductId && buyNowQty && buyNowQty > 0) {
+      const product = await Post.findById(buyNowProductId);
+      if (product) {
+        purchaseItems = [{ productId: product._id, name: product.title, price: product.price || 0, quantity: buyNowQty }];
+        computedCartTotal = (product.price || 0) * buyNowQty;
+      }
+    } else {
+      const cart = await Cart.findOne({ userId }).populate('items.productId');
+      if (cart && cart.items && cart.items.length > 0) {
+        purchaseItems = cart.items.map(item => ({
+          productId: item.productId?._id,
+          name: item.productId?.title,
+          price: item.productId?.price || 0,
+          quantity: item.quantity || 1,
+        }));
+        computedCartTotal = purchaseItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      }
     }
 
     const amountToStore = parseFloat(totalAmount) || parseFloat(payload?.amount) || computedCartTotal;
@@ -139,16 +154,29 @@ export async function GET(req) {
       amount: amountToStore,
       status: 'success',
       paymentMethod: 'eSewa',
-      items: cartItems,
+      items: purchaseItems,
     });
 
     console.log(`Payment details stored for transaction: ${transactionCode}`);
 
-    console.log(`Clearing cart for user: ${userId}`);
-    await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+    // Decrement inventory for purchased items
+    for (const item of purchaseItems) {
+      if (!item.productId || !item.quantity) continue;
+      const product = await Post.findById(item.productId);
+      if (!product) continue;
+      const current = product.amount || 0;
+      product.amount = Math.max(0, current - item.quantity);
+      await product.save();
+    }
+
+    // Clear cart only for cart-origin purchases (no buy-now meta present)
+    if (!buyNowProductId) {
+      console.log(`Clearing cart for user: ${userId}`);
+      await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+    }
 
     console.log("Payment successful, redirecting to success page");
-    return NextResponse.redirect(`${getBaseUrl()}/cart?payment=success&ref=${transactionCode}&cleared=true`);
+    return NextResponse.redirect(`${getBaseUrl()}/cart?payment=success&ref=${transactionCode}&cleared=${buyNowProductId ? 'false' : 'true'}`);
   } catch (error) {
     console.error('Error verifying payment:', error);
     return NextResponse.redirect(`${getBaseUrl()}/cart?payment=error`);

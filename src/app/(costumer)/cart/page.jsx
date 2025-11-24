@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/(auth)/AuthContext';
 import { useTheme } from '@/app/(theme)/ThemeContext';
 import Link from 'next/link';
-import { fetchCartApi, removeCartItemApi, checkoutApi } from '@/utils/cartApi';
+import { fetchCartApi, removeCartItemApi, checkoutApi, updateCartItemApi } from '@/utils/cartApi';
 import PaymentMessage from '@/components/cart/PaymentMessage';
 import CartItem from '@/components/cart/CartItem';
 import CartSummary from '@/components/cart/CartSummary';
@@ -129,7 +129,10 @@ export default function CartPage() {
         <div className={`rounded-lg shadow-md overflow-hidden ${theme.sidebar}`}>
           <div className="divide-y divide-gray-200">
             {items.map((item) => (
-              <CartItem key={item._id} item={item} theme={theme} onRemove={removeItem} />
+              <CartItem key={item._id} item={item} theme={theme} onRemove={removeItem} onUpdateQty={async (id, qty) => {
+                if (!user?.email) return;
+                try { await updateCartItemApi(user.email, id, qty); fetchCart(); } catch { setError('Failed to update quantity.'); }
+              }} />
             ))}
           </div>
 

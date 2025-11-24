@@ -1,13 +1,24 @@
 'use client';
 
-export default function CartItem({ item, theme, onRemove }) {
+export default function CartItem({ item, theme, onRemove, onUpdateQty }) {
   return (
     <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="flex items-center gap-4">
         <img src={item.imageUrl || '/logo.svg'} alt={item.name} className="w-16 h-16 object-cover rounded" />
         <div>
           <h3 className={`font-medium ${theme.text}`}>{item.name}</h3>
-          <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <span>Qty:</span>
+            <input
+              type="number"
+              min={1}
+              max={item.stock ?? 99}
+              value={item.quantity}
+              onChange={(e) => onUpdateQty?.(item._id, parseInt(e.target.value || '1', 10))}
+              className="w-16 border rounded px-2 py-1"
+            />
+            {item.stock === 0 && <span className="text-red-500 ml-2">Out of stock</span>}
+          </div>
           <p className={`${theme.text}`}>NPR {item.price}</p>
         </div>
       </div>

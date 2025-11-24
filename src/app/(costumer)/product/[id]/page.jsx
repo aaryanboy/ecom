@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import { addToCart } from "@/lib/addToCart"; // 👈 import from lib
+import { addToCart, buyNow } from "@/lib/addToCart"; // 👈 import from lib
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,6 +12,8 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const imagee = "/logo.svg";
 
   useEffect(() => {
@@ -23,8 +26,12 @@ export default function ProductDetail() {
 
   const handleAddToCart = async () => {
     setAdding(true);
-    await addToCart(product._id, router);
+    await addToCart(product._id, router, qty);
     setAdding(false);
+  };
+
+  const handleBuyNow = async () => {
+    setConfirmOpen(true);
   };
 
   if (loading)
@@ -64,13 +71,25 @@ export default function ProductDetail() {
           <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
           <p className={`${theme.mutedText} mb-5`}>{product.description}</p>
 
-          {product.price && (
+        {product.price && (
             <p className={`text-2xl font-semibold ${theme.success} mb-6`}>
               💰 {product.price} NPR
             </p>
           )}
 
           <div className="flex gap-4">
+            <div className="flex items-center gap-2">
+              <span>Qty:</span>
+              <input
+                type="number"
+                min={1}
+                max={product.amount ?? 99}
+                value={qty}
+                onChange={(e) => setQty(Math.max(1, Math.min(parseInt(e.target.value || '1', 10), product.amount ?? 99)))}
+                className="w-20 border rounded px-2 py-1"
+              />
+              {product.amount === 0 && <span className="text-red-500 ml-2">Out of stock</span>}
+            </div>
             <button
               onClick={handleAddToCart}
               disabled={adding}
@@ -79,12 +98,23 @@ export default function ProductDetail() {
               {adding ? "Adding..." : "🛒 Add to Cart"}
             </button>
             <button
-              onClick={() => alert("Proceeding to checkout...")}
+              onClick={handleBuyNow}
               className={`px-6 py-2 rounded-lg transition ${theme.button} ${theme.buttonHover}`}
             >
               💰 Buy Now
             </button>
           </div>
+
+          <ConfirmModal
+            open={confirmOpen}
+            title="Confirm Purchase"
+            message={`Are you sure you want to buy ${qty} item(s) now?`}
+            onConfirm={async () => {
+              setConfirmOpen(false);
+              await buyNow(product._id, qty);
+            }}
+            onCancel={() => setConfirmOpen(false)}
+          />
         </div>
       </div>
     </div>
