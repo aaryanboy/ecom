@@ -28,7 +28,7 @@ export async function updateCartItemApi(userId, itemId, quantity) {
 }
 
 export async function checkoutApi(userId) {
-  const res = await fetch('/api/cart/checkout', {
+  const res = await fetch('/api/payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId })
@@ -38,7 +38,7 @@ export async function checkoutApi(userId) {
 }
 
 export async function buyNowCheckoutApi(userId, productId, quantity) {
-  const res = await fetch('/api/checkout/buynow', {
+  const res = await fetch('/api/payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, productId, quantity })
@@ -46,3 +46,4 @@ export async function buyNowCheckoutApi(userId, productId, quantity) {
   if (!res.ok) throw new Error('Failed to initiate buy-now checkout');
   return res.text();
 }
+

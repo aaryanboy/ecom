@@ -1,20 +1,13 @@
 // /lib/addToCart.js
 
-export async function addToCart(productId, router, quantity = 1) {
+export async function addToCart(productId, router, quantity = 1, userEmail) {
     try {
-      // ✅ Step 1: Check if user is logged in
-      const sessionRes = await fetch("/api/check-session");
-      const sessionData = await sessionRes.json();
-  
-      if (!sessionData.loggedIn) {
+      if (!userEmail) {
         alert("You need to log in to add items to your cart.");
         router.push("/login");
         return false;
       }
-  
-      const userEmail = sessionData.user.email;
-  
-      // ✅ Step 2: Add product to cart
+
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,23 +30,19 @@ export async function addToCart(productId, router, quantity = 1) {
   }
 }
 
-export async function buyNow(productId, quantity = 1) {
+export async function buyNow(productId, quantity = 1, userEmail) {
   try {
-    const sessionRes = await fetch("/api/check-session");
-    const sessionData = await sessionRes.json();
-    if (!sessionData.loggedIn) {
+    if (!userEmail) {
       alert("You need to log in to buy now.");
       window.location.href = "/login";
       return false;
     }
 
-    const userEmail = sessionData.user.email;
-
     const w = window.open('', '_blank');
     if (!w) { alert('Popup blocked! Please allow popups for this site.'); return false; }
     w.document.write('<html><body><h2>Connecting to payment gateway...</h2></body></html>');
 
-    const res = await fetch('/api/checkout/buynow', {
+    const res = await fetch('/api/payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: userEmail, productId, quantity })

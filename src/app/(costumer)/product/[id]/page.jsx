@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 import { addToCart, buyNow } from "@/lib/addToCart";
 import ConfirmModal from "@/components/ConfirmModal";
 import Similar from "@/components/Similar";
@@ -10,6 +11,7 @@ export default function ProductDetail() {
   const { id } = useParams();
   const router = useRouter();
   const { theme } = useTheme();
+  const { user, loading: authLoading } = useAuth();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -27,11 +29,17 @@ export default function ProductDetail() {
 
   const handleAddToCart = async () => {
     setAdding(true);
-    await addToCart(product._id, router, qty);
+    if (!user?.email) {
+      router.push('/login');
+      setAdding(false);
+      return;
+    }
+    await addToCart(product._id, router, qty, user.email);
     setAdding(false);
   };
 
   const handleBuyNow = async () => {
+    if (!user?.email) { router.push('/login'); return; }
     setConfirmOpen(true);
   };
 
@@ -78,6 +86,27 @@ export default function ProductDetail() {
             </p>
           )}
 
+          {Array.isArray(product.tags) && product.tags.length > 0 && (
+            <ul className="flex flex-wrap gap-2 mb-4">
+              {product.tags.map((t) => (
+                <li
+                  key={t}
+                  className={`px-3 py-1 rounded-full text-sm border ${theme.border} ${theme.chip}`}
+                >
+                  #{t}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="mb-4">
+            {product.amount > 0 ? (
+              <p className={`${theme.success}`}>In stock: {product.amount}</p>
+            ) : (
+              <p className={`${theme.danger}`}>Out of stock</p>
+            )}
+          </div>
+
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <span>Qty:</span>
@@ -87,7 +116,7 @@ export default function ProductDetail() {
                 max={product.amount ?? 99}
                 value={qty}
                 onChange={(e) => setQty(Math.max(1, Math.min(parseInt(e.target.value || '1', 10), product.amount ?? 99)))}
-                className="w-20 border rounded px-2 py-1"
+              className="w-20 border rounded px-2 py-1"
               />
               {product.amount === 0 && <span className="text-red-500 ml-2">Out of stock</span>}
             </div>
@@ -112,7 +141,8 @@ export default function ProductDetail() {
             message={`Are you sure you want to buy ${qty} item(s) now?`}
             onConfirm={async () => {
               setConfirmOpen(false);
-              await buyNow(product._id, qty);
+              if (!user?.email) { router.push('/login'); return; }
+              await buyNow(product._id, qty, user.email);
             }}
             onCancel={() => setConfirmOpen(false)}
           />

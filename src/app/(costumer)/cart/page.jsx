@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/(auth)/AuthContext';
 import { useTheme } from '@/app/(theme)/ThemeContext';
 import Link from 'next/link';
-import { fetchCartApi, removeCartItemApi, checkoutApi, updateCartItemApi } from '@/utils/cartApi';
+import { fetchCartApi, removeCartItemApi, checkoutApi, updateCartItemApi } from '@/lib/cartClient';
 import PaymentMessage from '@/components/cart/PaymentMessage';
 import CartItem from '@/components/cart/CartItem';
 import CartSummary from '@/components/cart/CartSummary';

@@ -16,16 +16,11 @@ const Header = () => {
 
   const loggedOutLinks = [
     { name: "Home", path: "/" },
-   
-    
-   
-   
     { name: "Contact", path: "/contact" },
   ];
 
   const customerLinks = [
     { name: "Home", path: "/" },
-   
     { name: "Cart", path: "/cart" },
     { name: "Contact", path: "/contact" },
   ];

@@ -12,12 +12,9 @@ export default function EditPost() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    fetch(`/api/owner/post`)
+    fetch(`/api/post/${id}`)
       .then((res) => res.json())
-      .then((data) => {
-        const target = data.find((p) => p._id === id);
-        setPost(target);
-      })
+      .then((data) => setPost(data))
       .catch((err) => console.error("Error fetching post:", err));
   }, [id]);
 
@@ -35,7 +32,16 @@ export default function EditPost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...post };
+    const payload = {
+      id: post._id,
+      title: post.title,
+      description: post.description,
+      amount: Number(post.amount ?? 0),
+      price: Number(post.price ?? 0),
+      tags: Array.isArray(post.tags) ? post.tags : [],
+      imagePath: post.imagePath,
+      imageUrl: post.imageUrl,
+    };
 
     // If a new image is provided, upload and update fields
     if (imageFile) {

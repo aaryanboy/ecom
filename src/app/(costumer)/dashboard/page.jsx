@@ -1,34 +1,18 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 
 export default function Dashboard() {
   const { theme, toggleTheme, isDark } = useTheme();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    async function fetchSession() {
-      try {
-        const res = await fetch("/api/check-session");
-        const data = await res.json();
-
-        if (data.loggedIn) {
-          setUser(data.user);
-        } else {
-          // Optional: redirect to login if not logged in
-          window.location.href = "/login";
-        }
-      } catch (error) {
-        console.error("Error fetching session:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (!loading && !user) {
+      window.location.href = "/login";
     }
-
-    fetchSession();
-  }, []);
+  }, [loading, user]);
 
   if (loading) {
     return (
@@ -63,9 +47,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-      ) : (
-        <p className={`${theme.danger}`}>Not logged in</p>
-      )}
+      ) : null}
     
       <div className={`mt-10 rounded-xl p-4 shadow ${theme.card}`}>
         <p>

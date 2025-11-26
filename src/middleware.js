@@ -14,7 +14,7 @@ export async function middleware(req) {
     }
 
     // Call your check-session API
-    const res = await fetch(`${req.nextUrl.origin}/api/check-session`, {
+    const res = await fetch(`${req.nextUrl.origin}/api/auth/session`, {
       headers: { cookie: `session=${sessionCookie}` },
     });
 

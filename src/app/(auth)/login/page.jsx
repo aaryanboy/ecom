@@ -19,7 +19,7 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await axios.post("/api/login", { email, password });
+      const response = await axios.post("/api/auth/login", { email, password });
 
       console.log("Login successful:", response.data);
       

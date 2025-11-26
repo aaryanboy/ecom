@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function fetchSession() {
       try {
-        const res = await fetch("/api/check-session");
+        const res = await fetch("/api/auth/session");
         const data = await res.json();
         if (data.loggedIn) setUser(data.user);
       } catch (err) {
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   // ✅ logout function
   async function logout() {
     try {
-      await fetch("/api/logout", { method: "POST" }); // calls your backend logout
+      await fetch("/api/auth/logout", { method: "POST" });
       setUser(null); // immediately remove user from frontend
       // optional: redirect
       window.location.href = "/login";
