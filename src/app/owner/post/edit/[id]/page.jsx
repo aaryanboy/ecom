@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { CATEGORIES } from "@/lib/categories";
 
 export default function EditPost() {
   const { id } = useParams();
@@ -41,6 +42,8 @@ export default function EditPost() {
       tags: Array.isArray(post.tags) ? post.tags : [],
       imagePath: post.imagePath,
       imageUrl: post.imageUrl,
+      category: post.category || "",
+      subCategory: post.subCategory || "",
     };
 
     // If a new image is provided, upload and update fields
@@ -67,6 +70,7 @@ export default function EditPost() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+    const respData = await res.json();
 
     if (res.ok) {
       alert("✅ Post updated successfully!");
@@ -126,6 +130,37 @@ export default function EditPost() {
             required
             className={`w-1/2 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
           />
+        </div>
+
+        {/* Category */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Category</label>
+          <select
+            value={post.category || ""}
+            onChange={(e) => setPost({ ...post, category: e.target.value, subCategory: "" })}
+            className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          >
+            <option value="">Select category</option>
+            {Object.keys(CATEGORIES).map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sub-category */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Sub-category</label>
+          <select
+            value={post.subCategory || ""}
+            onChange={(e) => setPost({ ...post, subCategory: e.target.value })}
+            disabled={!post.category}
+            className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          >
+            <option value="">Select sub-category</option>
+            {(CATEGORIES[post.category] || []).map((sc) => (
+              <option key={sc} value={sc}>{sc}</option>
+            ))}
+          </select>
         </div>
 
         {/* Tag Input */}

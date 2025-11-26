@@ -9,8 +9,23 @@ const PostSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     imagePath: { type: String, default: null },
     imageUrl: { type: String, default: null },
+    category: { type: String, default: null },
+    subCategory: { type: String, default: null },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.Post || mongoose.model("Post", PostSchema);
+let PostModel;
+try {
+  PostModel = mongoose.model("Post");
+  if (!PostModel.schema.paths.category) {
+    PostModel.schema.add({ category: { type: String, default: null } });
+  }
+  if (!PostModel.schema.paths.subCategory) {
+    PostModel.schema.add({ subCategory: { type: String, default: null } });
+  }
+} catch {
+  PostModel = mongoose.model("Post", PostSchema);
+}
+
+export default PostModel;

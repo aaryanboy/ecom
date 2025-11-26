@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { CATEGORIES } from "@/lib/categories";
 
 export default function CreatePost() {
   const [title, setTitle] = useState("");
@@ -11,6 +12,8 @@ export default function CreatePost() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const [category, setCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -47,10 +50,17 @@ export default function CreatePost() {
       }
     }
 
+    if (!category || !subCategory) {
+      alert("Select category and sub-category");
+      return;
+    }
+
+    const payload = { title, description, amount, price, tags, imagePath, imageUrl, category, subCategory };
+
     const res = await fetch("/api/owner/post", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, amount, price, tags, imagePath, imageUrl }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (res.ok) {
@@ -111,6 +121,37 @@ export default function CreatePost() {
             required
             className={`w-1/2 p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
           />
+        </div>
+
+        {/* Category */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Category</label>
+          <select
+            value={category}
+            onChange={(e) => { setCategory(e.target.value); setSubCategory(""); }}
+            className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          >
+            <option value="">Select category</option>
+            {Object.keys(CATEGORIES).map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sub-category */}
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Sub-category</label>
+          <select
+            value={subCategory}
+            onChange={(e) => setSubCategory(e.target.value)}
+            disabled={!category}
+            className={`w-full p-3 rounded-lg border focus:ring-2 outline-none ${theme.border} ${theme.background} ${theme.text}`}
+          >
+            <option value="">Select sub-category</option>
+            {(CATEGORIES[category] || []).map((sc) => (
+              <option key={sc} value={sc}>{sc}</option>
+            ))}
+          </select>
         </div>
 
         {/* Image Upload */}

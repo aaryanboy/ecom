@@ -3,6 +3,7 @@ import connectToDatabase from "@/lib/db";
 import Post from "@/models/Post";
 import User from "@/models/User";
 import { createAdminClient, STORAGE_BUCKET } from "@/lib/supabase";
+import { CATEGORIES } from "@/lib/categories";
 
 // CREATE
 export async function POST(req) {
@@ -14,6 +15,13 @@ export async function POST(req) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const body = await req.json();
+    const { category, subCategory } = body;
+    if (!category || !subCategory) {
+      return NextResponse.json({ error: "Category and subCategory required" }, { status: 400 });
+    }
+    if (!CATEGORIES[category] || !CATEGORIES[category].includes(subCategory)) {
+      return NextResponse.json({ error: "Invalid category or subCategory" }, { status: 400 });
+    }
     const post = await Post.create(body);
     return NextResponse.json(post, { status: 201 });
   } catch (err) {
@@ -61,7 +69,18 @@ export async function PUT(req) {
   if (!user || !user.isOwner) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const { id, ...data } = await req.json();
+  const payload = await req.json();
+  const { id, category, subCategory, ...data } = payload;
+  if ((category !== undefined) || (subCategory !== undefined)) {
+    if (!category || !subCategory) {
+      return NextResponse.json({ error: "Category and subCategory required" }, { status: 400 });
+    }
+    if (!CATEGORIES[category] || !CATEGORIES[category].includes(subCategory)) {
+      return NextResponse.json({ error: "Invalid category or subCategory" }, { status: 400 });
+    }
+    data.category = category;
+    data.subCategory = subCategory;
+  }
   const updated = await Post.findByIdAndUpdate(id, data, { new: true });
   return NextResponse.json(updated);
 }
