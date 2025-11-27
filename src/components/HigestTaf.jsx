@@ -1,11 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import ProductCard from "@/components/ProductCard";
 
-export default function HigestTaf({ limit = 5 }) {
+export default function HigestTaf({ limit = 4 }) {
   const { theme } = useTheme();
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [topTag, setTopTag] = useState(null);
   const [items, setItems] = useState([]);
@@ -82,28 +81,9 @@ export default function HigestTaf({ limit = 5 }) {
   return (
     <div className={`max-w-7xl mx-auto px-4 mt-12 ${theme.text}`}>
       <h2 className="text-2xl font-bold mb-4">Popular in #{topTag}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {currentItems.map((product) => (
-          <div
-            key={product._id}
-            className={`border rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer ${theme.card} ${theme.border}`}
-            onClick={() => router.push(`/product/${product._id}`)}
-          >
-            <div className="relative w-full pb-[100%] bg-white">
-              <img
-                src={product.imageUrl || imagee}
-                alt={product.title}
-                className="absolute inset-0 w-full h-full object-contain"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2 line-clamp-1">{product.title}</h3>
-              <p className={`${theme.mutedText} text-sm mb-3 line-clamp-2`}>{product.description}</p>
-              {product.price && (
-                <p className={`text-base ${theme.success} font-semibold`}>💰 {product.price} NPR</p>
-              )}
-            </div>
-          </div>
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 

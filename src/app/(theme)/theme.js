@@ -21,7 +21,7 @@ export const lightTheme = {
 };
   
   export const darkTheme = {
-    background: "bg-black",
+    background: "bg-gray-900",
     navbar: "bg-gray-800",
     sidebar: "bg-neutral-900",
     card: "bg-neutral-900",

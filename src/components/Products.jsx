@@ -1,15 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import ProductCard from "@/components/ProductCard";
 
 export default function ProductList() {
-  const router = useRouter();
   const { theme } = useTheme();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(8);
   const [total, setTotal] = useState(0);
   const imagee = "/logo.svg";
 
@@ -84,28 +83,9 @@ export default function ProductList() {
         <h1 className="text-3xl font-bold">All Products</h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {products.map((product) => (
-          <div
-            key={product._id}
-            className={`border rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer ${theme.card} ${theme.border}`}
-            onClick={() => router.push(`/product/${product._id}`)}
-          >
-            <div className="relative w-full pb-[100%] bg-white">
-              <img
-                src={product.imageUrl || imagee}
-                alt={product.title}
-                className="absolute inset-0 w-full h-full object-contain"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2 line-clamp-1">{product.title}</h3>
-              <p className={`${theme.mutedText} text-sm mb-3 line-clamp-2`}>{product.description}</p>
-              {product.price && (
-                <p className={`text-base ${theme.success} font-semibold`}>💰 {product.price} NPR</p>
-              )}
-            </div>
-          </div>
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 

@@ -148,7 +148,11 @@ export default function ProductDetail() {
           />
         </div>
       </div>
-      <Similar productId={product._id} tags={product.tags || []} />
+
+      
+      <Similar productId={product._id} subCategory={product.subCategory || ""} tags={product.tags || []} /> 
+
+      
     </div>
   );
 }
