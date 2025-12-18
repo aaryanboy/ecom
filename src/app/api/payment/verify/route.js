@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import Cart from "@/models/cart";
 import Payment from "@/models/Payment";
+import Order from "@/models/Order";
 import Post from "@/models/Post";
 import connectToDatabase from "@/lib/db";
 import { generateEsewaSignature } from "@/lib/generateEsewaSignature";
@@ -154,6 +155,15 @@ export async function GET(req) {
       amount: amountToStore,
       status: 'success',
       paymentMethod: 'eSewa',
+      items: purchaseItems,
+    });
+
+    await Order.create({
+      userId,
+      transactionId: transactionCode,
+      amount: amountToStore,
+      paymentStatus: 'paid',
+      deliveryStatus: 'pending',
       items: purchaseItems,
     });
 

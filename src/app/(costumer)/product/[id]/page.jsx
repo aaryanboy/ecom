@@ -107,33 +107,38 @@ export default function ProductDetail() {
             )}
           </div>
 
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2">
-              <span>Qty:</span>
-              <input
-                type="number"
-                min={1}
-                max={product.amount ?? 99}
-                value={qty}
-                onChange={(e) => setQty(Math.max(1, Math.min(parseInt(e.target.value || '1', 10), product.amount ?? 99)))}
-              className="w-20 border rounded px-2 py-1"
-              />
-              {product.amount === 0 && <span className="text-red-500 ml-2">Out of stock</span>}
+          {product.amount > 0 ? (
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <span>Qty:</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={product.amount ?? 99}
+                  value={qty}
+                  onChange={(e) => setQty(Math.max(1, Math.min(parseInt(e.target.value || '1', 10), product.amount ?? 99)))}
+                  className="w-20 border rounded px-2 py-1"
+                />
+              </div>
+              <button
+                onClick={handleAddToCart}
+                disabled={adding}
+                className={`px-6 py-2 rounded-lg transition disabled:opacity-50 ${theme.button} ${theme.buttonHover}`}
+              >
+                {adding ? "Adding..." : "🛒 Add to Cart"}
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className={`px-6 py-2 rounded-lg transition ${theme.button} ${theme.buttonHover}`}
+              >
+                💰 Buy Now
+              </button>
             </div>
-            <button
-              onClick={handleAddToCart}
-              disabled={adding}
-              className={`px-6 py-2 rounded-lg transition disabled:opacity-50 ${theme.button} ${theme.buttonHover}`}
-            >
-              {adding ? "Adding..." : "🛒 Add to Cart"}
-            </button>
-            <button
-              onClick={handleBuyNow}
-              className={`px-6 py-2 rounded-lg transition ${theme.button} ${theme.buttonHover}`}
-            >
-              💰 Buy Now
-            </button>
-          </div>
+          ) : (
+            <div className="mt-2">
+              <span className="text-red-500 font-semibold">Out of stock</span>
+            </div>
+          )}
 
           <ConfirmModal
             open={confirmOpen}

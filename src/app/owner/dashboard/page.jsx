@@ -8,20 +8,25 @@ export default function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({ totalRevenue: 0, totalOrders: 0, averageOrderValue: 0 });
-  const [items, setItems] = useState([]);
-  const [payments, setPayments] = useState([]);
+  const [orders, setOrders] = useState({ pending: [], shipped: [], delivered: [] });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/owner/payments");
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || "Failed to load payments");
+        const [payRes, ordRes] = await Promise.all([
+          fetch("/api/owner/payments"),
+          fetch("/api/owner/orders")
+        ]);
+        const payData = await payRes.json();
+        const ordData = await ordRes.json();
+        if (!payRes.ok || !payData.ok) {
+          throw new Error(payData.error || "Failed to load payments");
         }
-        setStats(data.stats);
-        setItems(data.items);
-        setPayments(data.payments);
+        if (!ordRes.ok || !ordData.ok) {
+          throw new Error(ordData.error || "Failed to load orders");
+        }
+        setStats(payData.stats);
+        setOrders({ pending: ordData.pending, shipped: ordData.shipped, delivered: ordData.delivered });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -63,65 +68,37 @@ export default function OwnerDashboard() {
             </div>
           </div>
 
-          {/* Top Sold Items */}
           <div className={`rounded-xl shadow ${theme.card}`}>
-            <div className="px-6 py-4 border-b font-semibold">Top Sold Items</div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className={`text-left border-b ${theme.border}`}>
-                    <th className="px-6 py-3">Item</th>
-                    <th className="px-6 py-3">Quantity</th>
-                    <th className="px-6 py-3">Revenue</th>
-                    <th className="px-6 py-3">Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.length === 0 ? (
-                    <tr>
-                      <td className="px-6 py-3" colSpan={4}>No sales yet</td>
+            <div className="px-6 py-4 border-b font-semibold">Order History</div>
+            <div className="p-6">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className={`text-left border-b ${theme.border}`}>
+                      <th className="px-3 py-2">Order</th>
+                      <th className="px-3 py-2">User</th>
+                      <th className="px-3 py-2">Amount</th>
+                      <th className="px-3 py-2">Date</th>
                     </tr>
-                  ) : (
-                    items.map((item, idx) => (
-                      <tr key={idx} className={`border-b ${theme.border}`}>
-                        <td className="px-6 py-3">{item.name}</td>
-                        <td className="px-6 py-3">{item.totalQuantity}</td>
-                        <td className="px-6 py-3">${item.totalRevenue.toFixed(2)}</td>
-                        <td className="px-6 py-3">${(item.latestPrice || 0).toFixed(2)}</td>
+                  </thead>
+                  <tbody>
+                    {orders.delivered.length === 0 ? (
+                      <tr><td className="px-3 py-2" colSpan={4}>No delivered orders</td></tr>
+                    ) : orders.delivered.map((o) => (
+                      <tr key={o._id} className={`border-b ${theme.border}`}>
+                        <td className="px-3 py-2">{o.transactionId}</td>
+                        <td className="px-3 py-2">{o.userId}</td>
+                        <td className="px-3 py-2">${(o.amount || 0).toFixed(2)}</td>
+                        <td className="px-3 py-2">{new Date(o.createdAt).toLocaleString()}</td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          {/* Recent Payments */}
-          <div className={`rounded-xl shadow ${theme.card}`}>
-            <div className="px-6 py-4 border-b font-semibold">Recent Payments</div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className={`text-left border-b ${theme.border}`}>
-                    <th className="px-6 py-3">Txn Ref</th>
-                    <th className="px-6 py-3">User</th>
-                    <th className="px-6 py-3">Amount</th>
-                    <th className="px-6 py-3">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((p) => (
-                    <tr key={p._id} className={`border-b ${theme.border}`}>
-                      <td className="px-6 py-3">{p.transactionId}</td>
-                      <td className="px-6 py-3">{p.userId}</td>
-                      <td className="px-6 py-3">${(p.amount || 0).toFixed(2)}</td>
-                      <td className="px-6 py-3">{new Date(p.createdAt).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          
         </div>
       )}
     </div>

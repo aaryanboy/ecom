@@ -3,32 +3,6 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db";
 import User from "@/models/User";
 import Payment from "@/models/Payment";
-import Post from "@/models/Post";
-
-// Utility to aggregate items sold across payments
-function aggregateItems(payments, postMap) {
-  const map = new Map();
-  for (const p of payments) {
-    for (const item of p.items || []) {
-      const key = item.productId?.toString();
-      if (!key) continue;
-
-      const post = postMap.get(key);
-      const existing = map.get(key) || {
-        productId: item.productId,
-        name: post ? post.title : "Unknown Product",
-        totalQuantity: 0,
-        totalRevenue: 0,
-        latestPrice: item.price,
-      };
-      existing.totalQuantity += item.quantity || 0;
-      existing.totalRevenue += (item.price || 0) * (item.quantity || 0);
-      existing.latestPrice = item.price;
-      map.set(key, existing);
-    }
-  }
-  return Array.from(map.values()).sort((a, b) => b.totalRevenue - a.totalRevenue);
-}
 
 export async function GET(req) {
   try {
@@ -44,18 +18,11 @@ export async function GET(req) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const [payments, posts] = await Promise.all([
-      Payment.find({ status: "success" }).sort({ createdAt: -1 }).lean(),
-      Post.find({}).lean(),
-    ]);
-
-    const postMap = new Map(posts.map((p) => [p._id.toString(), p]));
+    const payments = await Payment.find({ status: "success" }).lean();
 
     const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
     const totalOrders = payments.length;
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-
-    const itemsAggregated = aggregateItems(payments, postMap);
 
     return NextResponse.json({
       ok: true,
@@ -64,8 +31,6 @@ export async function GET(req) {
         totalOrders,
         averageOrderValue,
       },
-      items: itemsAggregated,
-      payments,
     });
   } catch (err) {
     console.error("Error fetching owner payments:", err);
