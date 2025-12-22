@@ -25,7 +25,7 @@ export default function CategorizedProducts({ tag }) {
   if (loading) {
     return (
       <div className={`flex items-center justify-center ${theme.background} ${theme.text}`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <div className={`animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 ${theme.spinnerBorder}`}></div>
       </div>
     );
   }
@@ -49,7 +49,7 @@ export default function CategorizedProducts({ tag }) {
             className={`border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer ${theme.card} ${theme.border}`}
             onClick={() => handleProductClick(product._id)}
           >
-            <div className="relative w-full pb-[100%] bg-white">
+            <div className={`relative w-full pb-[100%] ${theme.imageBg}`}>
               <img
                 src={product.imageUrl || imagee}
                 alt={product.title}

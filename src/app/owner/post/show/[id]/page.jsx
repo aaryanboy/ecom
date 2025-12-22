@@ -56,7 +56,7 @@ export default function ShowPost() {
           <img
             src={post.imageUrl}
             alt={post.title}
-            className="w-full h-64 object-cover rounded-lg border mb-6"
+            className={`w-full h-64 object-cover rounded-lg border mb-6 ${theme.border}`}
           />
         )}
         <div className="text-sm mb-6 space-y-1">

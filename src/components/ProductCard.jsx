@@ -17,7 +17,7 @@ export default function ProductCard({ product, onClick, className = "" }) {
       className={` rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-blue-400 cursor-pointer  ${theme.card} ${theme.border} ${className}`}
       onClick={handleClick}
     >
-      <div className="relative w-full pb-[100%] bg-white">
+      <div className={`relative w-full pb-[100%] ${theme.imageBg}`}>
         <img
           src={product.imageUrl || imagee}
           alt={product.title}
@@ -35,4 +35,3 @@ export default function ProductCard({ product, onClick, className = "" }) {
     </div>
   );
 }
-

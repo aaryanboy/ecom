@@ -4,6 +4,7 @@ import Link from "next/link";
 import ThemeDropdown from "./ThemeDropdown";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
+import SearchBar from "@/components/SearchBar";
 
 const Header = () => {
   const { theme } = useTheme();
@@ -41,8 +42,8 @@ const Header = () => {
 
   return (
     <header className={`fixed top-0 left-0 w-full z-50 backdrop-blur ${theme.navbar} ${theme.text} shadow-sm`}>
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="w-full px-2 sm:px-4">
+        <div className="flex h-20  items-center justify-between">
           {/* Left: Logo + Theme */}
           <div className="flex items-center gap-3">
             <Link href="/" className="text-lg font-bold tracking-tight">
@@ -51,21 +52,29 @@ const Header = () => {
             <ThemeDropdown />
           </div>
 
-          {/* Middle: Navigation */}
-          <nav className="hidden md:flex items-center gap-2 text-sm">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className={`px-3 py-2 rounded-md ${theme.buttonHover} transition`}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+          <div className="flex items-center gap-4 flex-1 justify-center">
+            <nav className="hidden md:flex items-center gap-2 text-sm">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.path}
+                  className={`px-3 py-2 rounded-md ${theme.buttonHover} transition`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
+           
+          </div>
 
-          {/* Right: Auth Buttons */}
+          {/* Right: Search + Auth */}
           <div className="flex items-center gap-3">
+            {!(user?.isOwner) && (
+              <div className="w-56 sm:w-64 md:w-96">
+                <SearchBar className="relative mb-0" />
+              </div>
+            )}
+
             {user ? (
               <button
                 onClick={logout}

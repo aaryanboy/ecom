@@ -72,13 +72,13 @@ export default function ProductList() {
   if (loading) {
     return (
       <div className={`min-h-[200px] flex items-center justify-center ${theme.background} ${theme.text}`}>
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+        <div className={`animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 ${theme.spinnerBorder}`}></div>
       </div>
     );
   }
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 ${theme.text}`}>
+    <div className={`max-w-7xl mx-auto px-4 mt-6 sm:mt-8 ${theme.text}`}>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">All Products</h1>
       </div>

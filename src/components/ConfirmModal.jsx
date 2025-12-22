@@ -6,7 +6,7 @@ export default function ConfirmModal({ open, title = 'Confirm', message, onConfi
   const { theme } = useTheme();
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center ${theme.overlay}`}>
       <div className={`w-full max-w-md rounded-lg shadow ${theme.card} p-6`}>
         <h2 className={`text-xl font-semibold mb-3 ${theme.text}`}>{title}</h2>
         <p className={`${theme.secondaryText} mb-6`}>{message}</p>
@@ -18,4 +18,3 @@ export default function ConfirmModal({ open, title = 'Confirm', message, onConfi
     </div>
   );
 }
-

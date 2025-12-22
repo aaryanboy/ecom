@@ -46,7 +46,7 @@ export default function ProductDetail() {
   if (loading)
     return (
       <div className={`min-h-screen flex items-center justify-center ${theme.background} ${theme.text}`}>
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+        <div className={`animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 ${theme.spinnerBorder}`}></div>
       </div>
     );
   if (!product)
@@ -67,7 +67,7 @@ export default function ProductDetail() {
 
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className={`w-full md:w-1/2 shadow-md ${theme.card}`}>
-          <div className="relative w-full pb-[100%] bg-white">
+          <div className={`relative w-full pb-[100%] ${theme.imageBg}`}>
             <img
               src={product.imageUrl || imagee}
               alt={product.title}
@@ -136,7 +136,7 @@ export default function ProductDetail() {
             </div>
           ) : (
             <div className="mt-2">
-              <span className="text-red-500 font-semibold">Out of stock</span>
+              <span className={`${theme.danger} font-semibold`}>Out of stock</span>
             </div>
           )}
 

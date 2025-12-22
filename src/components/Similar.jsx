@@ -69,7 +69,7 @@ export default function Similar({ productId, subCategory = "", tags = [], limit 
 
       {loading ? (
         <div className="flex items-center gap-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
+          <div className={`animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 ${theme.spinnerBorder}`}></div>
           <span className={theme.mutedText}>Loading…</span>
         </div>
       ) : items.length === 0 ? (
@@ -92,7 +92,7 @@ export default function Similar({ productId, subCategory = "", tags = [], limit 
               onClick={() => router.push(`/product/${product._id}`)}
             >
               {/* Full Image — Not Cropped */}
-              <div className="relative w-full h-48 sm:h-56 md:h-60 p-2 flex items-center justify-center bg-white">
+              <div className={`relative w-full h-48 sm:h-56 md:h-60 p-2 flex items-center justify-center ${theme.imageBg}`}>
                 <img
                   src={product.imageUrl || imagee}
                   alt={product.title}

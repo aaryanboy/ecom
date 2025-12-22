@@ -98,7 +98,7 @@ export default function CartPage() {
       <div className="min-h-screen pt-24 px-4 flex justify-center">
         <div className="w-full max-w-4xl">
           <h1 className={`text-2xl font-bold mb-6 ${theme.text}`}>Your Cart</h1>
-          <div className="text-center py-16 text-red-500">{error}</div>
+          <div className={`text-center py-16 ${theme.danger}`}>{error}</div>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export default function CartPage() {
         <h1 className={`text-2xl font-bold mb-6 ${theme.text}`}>Your Cart</h1>
         <PaymentMessage status={paymentStatus} refId={paymentRef} />
         <div className={`rounded-lg shadow-md overflow-hidden ${theme.sidebar}`}>
-          <div className="divide-y divide-gray-200">
+          <div className={`divide-y ${theme.divide}`}>
             {items.map((item) => (
               <CartItem key={item._id} item={item} theme={theme} onRemove={removeItem} onUpdateQty={async (id, qty) => {
                 if (!user?.email) return;

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/app/(theme)/ThemeContext';
 import ProductCard from '@/components/ProductCard';
-import SearchBar from '@/components/SearchBar';
 
 export default function SearchPage() {
   const { theme } = useTheme();
@@ -34,7 +33,6 @@ export default function SearchPage() {
 
   return (
     <div className={`max-w-7xl mx-auto px-4 ${theme.text}`}>
-      <SearchBar initialQuery={q} />
       <h1 className="text-2xl font-bold mb-4">Search results for: {q}</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {items.map((p) => (

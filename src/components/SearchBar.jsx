@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useRouter } from "next/navigation";
 
-export default function SearchBar({ initialQuery = "" }) {
+export default function SearchBar({ initialQuery = "", className = "" }) {
   const { theme } = useTheme();
   const router = useRouter();
   const [q, setQ] = useState(initialQuery);
@@ -30,26 +30,26 @@ export default function SearchBar({ initialQuery = "" }) {
   };
 
   return (
-    <div className="relative mb-6">
-      <div className="flex gap-2">
+    <div className={`relative w-full ${className}`}>
+      <div className="flex items-center gap-2">
         <input
           value={q}
           onChange={(e) => { setQ(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           onKeyDown={(e) => { if (e.key === "Enter") goSearch(); }}
           placeholder="Search products..."
-          className={`flex-1 p-3 rounded-lg border ${theme.border} ${theme.background} ${theme.text}`}
+          className={`p-3 flex-1 rounded-lg border ${theme.border} ${theme.background} ${theme.text}`}
         />
         <button
           onClick={goSearch}
-          className={`px-4 py-2 rounded ${theme.button} ${theme.buttonHover}`}
+          className={`px-4 py-2 rounded-md text-sm shrink-0 whitespace-nowrap ${theme.button} ${theme.buttonHover}`}
         >
           Search
         </button>
       </div>
 
       {open && suggestions.length > 0 && (
-        <ul className={`absolute z-10 mt-2 w-full rounded-lg border ${theme.border} ${theme.card}`}>
+        <ul className={`absolute left-0 right-0 z-10 mt-2 w-full rounded-lg border ${theme.border} ${theme.card}`}>
           {suggestions.map((s) => (
             <li
               key={s}
