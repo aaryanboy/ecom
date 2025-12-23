@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import ProductShow from "@/components/ProductShow";
+import ProductShow from "@/components/products/ProductShow";
 
 export default function HigestTaf({ limit = 4 }) {
   const { theme } = useTheme();
@@ -128,4 +128,3 @@ export default function HigestTaf({ limit = 4 }) {
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import ProductShow from "@/components/ProductShow";
+import ProductShow from "@/components/products/ProductShow";
 
 export default function ProductList() {
   const { theme } = useTheme();
@@ -20,7 +20,6 @@ export default function ProductList() {
         console.log("[Home] Fetching All Products", { page, limit });
         const res = await fetch(`/api/posts?page=${page}&limit=${limit}`);
         const data = await res.json();
-        // API returns shape { posts, total, page, limit } when paginated
         const posts = Array.isArray(data) ? data : data.posts;
         const totalCount = Array.isArray(data) ? data.length : data.total;
 
@@ -52,7 +51,6 @@ export default function ProductList() {
     return () => { mounted = false; };
   }, [page, limit]);
 
-  // Log what’s actually being rendered whenever products change
   useEffect(() => {
     console.log("[Home] Rendering All Products", {
       page,
@@ -89,7 +87,6 @@ export default function ProductList() {
         ))}
       </div>
 
-      {/* Pagination controls */}
       <div className="flex items-center justify-center gap-2 mt-8">
         <button
           onClick={() => goToPage(page - 1)}

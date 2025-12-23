@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '@/app/(theme)/ThemeContext';
-import ProductCard from '@/components/ProductCard';
-import CategorySidebar from '@/components/CategorySidebar';
+import ProductCard from '@/components/products/ProductCard';
+import CategorySidebar from '@/components/categories/CategorySidebar';
 
 export default function SearchPage() {
   const { theme } = useTheme();

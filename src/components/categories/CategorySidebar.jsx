@@ -31,4 +31,3 @@ export default function CategorySidebar({ title = "Shop by Category", categories
     </div>
   );
 }
-

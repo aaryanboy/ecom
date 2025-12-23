@@ -1,9 +1,9 @@
 import "./globals.css";
 import { ThemeProvider } from "./(theme)/ThemeContext";
-import Header from "@/components/Header";
+import Header from "@/components/layout/Header";
 import ThemeWrapper from "./(theme)/ThemeWrapper";
 import { AuthProvider } from "./(auth)/AuthContext";
-import FooterSuggested from "@/components/FooterSuggested";
+import FooterSuggested from "@/components/layout/FooterSuggested";
 
 export default function RootLayout({ children }) {
   return (

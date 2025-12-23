@@ -1,8 +1,8 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import SearchBar from "@/components/SearchBar";
-import ProductCard from "@/components/ProductCard";
+import SearchBar from "@/components/search/SearchBar";
+import ProductCard from "@/components/products/ProductCard";
 
 export default function SearchResults() {
   const { theme } = useTheme();

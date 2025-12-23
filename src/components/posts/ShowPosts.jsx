@@ -119,7 +119,6 @@ export default function ShowPosts() {
       className={`grid grid-cols-12 gap-4 px-6 py-4 border-b cursor-pointer hover:shadow-md transition ${theme.card} ${theme.border}`}
       onClick={() => router.push(`/owner/post/show/${post._id}`)}
     >
-      {/* Item Details Column */}
       <div className="col-span-4">
         <label className="flex items-start gap-3" onClick={(e) => e.stopPropagation()}>
           <input
@@ -153,17 +152,14 @@ export default function ShowPosts() {
         </label>
       </div>
       
-      {/* Amount Column */}
       <div className="col-span-2 flex items-center justify-center">
         <span className="font-medium">{post.amount}</span>
       </div>
       
-      {/* Price Column */}
       <div className="col-span-2 flex items-center justify-center">
         <span className="font-medium">Rs. {post.price}</span>
       </div>
       
-      {/* Tags Column */}
       <div className="col-span-2 flex items-center justify-center">
         {post.tags?.length > 0 ? (
           <div className="flex flex-wrap gap-1 justify-center">
@@ -186,7 +182,6 @@ export default function ShowPosts() {
         )}
       </div>
       
-      {/* Actions Column */}
       <div className="col-span-2 flex items-center justify-center space-x-2">
         <button
           onClick={(e) => {
@@ -198,32 +193,22 @@ export default function ShowPosts() {
           ✏️ Edit
         </button>
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push(`/owner/post/show/${post._id}`);
-          }}
-          className={`px-3 py-2 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
-        >
-          👁️ View
-        </button>
-        <button
           onClick={async (e) => {
             e.stopPropagation();
-            const confirmed = confirm("Are you sure you want to delete this post? This will also remove its image.");
-            if (!confirmed) return;
+            const ok = confirm('Delete this post? This will also remove images.');
+            if (!ok) return;
             try {
-              const res = await fetch(`/api/owner/post?id=${post._id}`, { method: "DELETE" });
+              const res = await fetch(`/api/owner/post/${post._id}`, { method: 'DELETE' });
               const data = await res.json();
               if (res.ok && data.ok) {
-                alert("🗑️ Post deleted successfully");
-                // Optimistically remove from list
                 setPosts((prev) => prev.filter((p) => p._id !== post._id));
+                alert('🗑️ Post deleted');
               } else {
-                alert("❌ Failed to delete post");
+                alert('❌ Failed to delete');
               }
             } catch (err) {
-              console.error("Error deleting post:", err);
-              alert("❌ Error deleting post");
+              console.error('Delete error:', err);
+              alert('❌ Error deleting');
             }
           }}
           className={`px-3 py-2 rounded-lg font-medium transition bg-red-600 text-white hover:bg-red-700`}
@@ -235,7 +220,6 @@ export default function ShowPosts() {
   ))}
       </div>
       </div>
-    
     </div>
   );
 }

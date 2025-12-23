@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import ShowPosts from "@/components/ShowPosts";
+import ShowPosts from "@/components/posts/ShowPosts";
 
 export default function StartPage() {
   const router = useRouter();

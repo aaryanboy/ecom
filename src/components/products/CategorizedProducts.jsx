@@ -1,6 +1,6 @@
-'use client';
+"use client";
 import { useEffect, useState } from "react";
-import ProductShow from "@/components/ProductShow";
+import ProductShow from "@/components/products/ProductShow";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
 export default function CategorizedProducts({ tag }) {
@@ -35,10 +35,8 @@ export default function CategorizedProducts({ tag }) {
       <div className="a">hello
       {products}
       </div>
-    ); // Don't render anything if there are no products for the tag
+    );
   }
-
-  
 
   return (
     <div className={`w-full px-4 mt-6 sm:mt-8 ${theme.text}`}>

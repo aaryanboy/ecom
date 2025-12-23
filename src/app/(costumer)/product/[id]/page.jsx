@@ -4,8 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import { addToCart, buyNow } from "@/lib/addToCart";
-import ConfirmModal from "@/components/ConfirmModal";
-import Similar from "@/components/Similar";
+import ConfirmModal from "@/components/modals/ConfirmModal";
+import Similar from "@/components/products/Similar";
 
 export default function ProductDetail() {
   const { id } = useParams();

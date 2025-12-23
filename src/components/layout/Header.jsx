@@ -1,17 +1,16 @@
-"use client"; // ✅ must be at the very top
+"use client";
 
 import Link from "next/link";
-import ThemeButton from "./ThemeButton";
+import ThemeButton from "@/components/layout/ThemeButton";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/search/SearchBar";
 
 const Header = () => {
   const { theme } = useTheme();
-  const { user, logout, loading } = useAuth(); // include loading
+  const { user, logout, loading } = useAuth();
 
   if (loading) {
-   
       return null;
   }
 
@@ -47,7 +46,6 @@ const Header = () => {
     <header className={`fixed top-0 left-0 w-full z-50 backdrop-blur ${theme.navbar} ${theme.text} shadow-sm`}>
       <div className="w-full px-2 sm:px-4">
         <div className="flex h-20  items-center justify-between">
-          {/* Left: Logo + Theme */}
           <div className="flex items-center gap-3">
             <Link href="/" className="text-lg font-bold tracking-tight">
               {user?.isOwner ? "MyShop (Owner)" : "MyShop"}
@@ -75,7 +73,6 @@ const Header = () => {
            
           </div>
 
-          {/* Right: Search + Auth */}
           <div className="flex items-center gap-3">
             {!(user?.isOwner) && (
               <div className="w-56 sm:w-64 md:w-96">

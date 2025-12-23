@@ -19,7 +19,6 @@ export default function Similar({ productId, subCategory = "", tags = [], limit 
 
         const chosen = new Map();
 
-        // 1) Prefer subCategory matches
         if (subCategory) {
           try {
             const res = await fetch(`/api/products/subcategory/${encodeURIComponent(subCategory)}`);
@@ -32,7 +31,6 @@ export default function Similar({ productId, subCategory = "", tags = [], limit 
           } catch (_) {}
         }
 
-        // 2) If not enough, fill with tag matches
         if (chosen.size < limit && t.length) {
           const responses = await Promise.all(
             t.map((tag) =>
@@ -91,7 +89,6 @@ export default function Similar({ productId, subCategory = "", tags = [], limit 
               className={`border rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer ${theme.card} ${theme.border}`}
               onClick={() => router.push(`/product/${product._id}`)}
             >
-              {/* Full Image — Not Cropped */}
               <div className={`relative w-full h-48 sm:h-56 md:h-60 p-2 flex items-center justify-center ${theme.imageBg}`}>
                 <img
                   src={product.imageUrl || imagee}

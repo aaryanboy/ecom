@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useTheme } from '@/app/(theme)/ThemeContext';
+import { useTheme } from "@/app/(theme)/ThemeContext";
 
-export default function ConfirmModal({ open, title = 'Confirm', message, onConfirm, onCancel }) {
+export default function ConfirmModal({ open, title = "Confirm", message, onConfirm, onCancel }) {
   const { theme } = useTheme();
   if (!open) return null;
   return (

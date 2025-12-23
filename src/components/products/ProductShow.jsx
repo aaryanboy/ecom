@@ -33,4 +33,3 @@ export default function ProductShow({ product, onClick, className = "" }) {
     </div>
   );
 }
-
