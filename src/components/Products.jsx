@@ -99,19 +99,28 @@ export default function ProductList() {
           ← Previous
         </button>
 
-        {[...Array(totalPages)].map((_, idx) => {
-          const p = idx + 1;
-          const isCurrent = p === page;
-          return (
-            <button
-              key={p}
-              onClick={() => goToPage(p)}
-              className={`px-3 py-2 rounded border ${theme.border} ${isCurrent ? 'font-bold underline' : ''}`}
-            >
-              {p}
-            </button>
-          );
-        })}
+        {(() => {
+          const candidates = [page - 1, page, page + 1].filter((p) => p >= 1 && p <= totalPages);
+          while (candidates.length < 3 && candidates[0] > 1) {
+            candidates.unshift(candidates[0] - 1);
+          }
+          while (candidates.length < 3 && candidates[candidates.length - 1] < totalPages) {
+            candidates.push(candidates[candidates.length - 1] + 1);
+          }
+          const uniq = Array.from(new Set(candidates));
+          return uniq.map((p) => {
+            const isCurrent = p === page;
+            return (
+              <button
+                key={p}
+                onClick={() => goToPage(p)}
+                className={`px-3 py-2 rounded border ${theme.border} ${isCurrent ? 'font-bold underline' : ''}`}
+              >
+                {p}
+              </button>
+            );
+          });
+        })()}
 
         <button
           onClick={() => goToPage(page + 1)}
