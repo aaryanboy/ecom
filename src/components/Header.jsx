@@ -1,7 +1,7 @@
 "use client"; // ✅ must be at the very top
 
 import Link from "next/link";
-import ThemeDropdown from "./ThemeDropdown";
+import ThemeButton from "./ThemeButton";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
 import SearchBar from "@/components/SearchBar";
@@ -49,7 +49,7 @@ const Header = () => {
             <Link href="/" className="text-lg font-bold tracking-tight">
               {user?.isOwner ? "MyShop (Owner)" : "MyShop"}
             </Link>
-            <ThemeDropdown />
+            <ThemeButton />
           </div>
 
           <div className="flex items-center gap-4 flex-1 justify-center">

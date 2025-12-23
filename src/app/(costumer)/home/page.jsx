@@ -1,46 +1,23 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { useTheme } from "@/app/(theme)/ThemeContext";
 import CategorizedProducts from "@/components/CategorizedProducts";
-import ProductList from "@/components/Products";
 
 export default function Home() {
-  const { theme } = useTheme();
-  const [loading, setLoading] = useState(true);
+ 
 
-  useEffect(() => {
-    // Simulate a loading time
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center ${theme.background} ${theme.text}`}>
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  const categories = ["mounts", "hoodies", "shirts", "still-water", "cables"];
+ 
+  const categories = ["mounts", "pretty", "Skincare", "aryan", "Beauty & Personal Care"]; //tags 
 
   return (
-    <div className={`min-h-screen ${theme.background} ${theme.text} px-2 py-6`}>
-      <h1 className="text-3xl font-bold mb-8 text-center">Welcome to MyShop</h1>
+    <div >
 
-      <div className="space-y-12">
-        {/* All Products section */}
-        <ProductList />
-
+       
         {/* Category sections */}
-        {categories.map((category) => (
-          <CategorizedProducts key={category} tag={category} />
-        ))}
+       {categories.map((category) => {
+  console.log("Category:", category);
+  return <CategorizedProducts key={category} tag={category} />;
+})}
+
       </div>
-    </div>
   );
 }
