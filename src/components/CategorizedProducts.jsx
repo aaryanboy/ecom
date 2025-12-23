@@ -1,10 +1,9 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import ProductShow from "@/components/ProductShow";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
 export default function CategorizedProducts({ tag }) {
-  const router = useRouter();
   const { theme } = useTheme();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,42 +34,15 @@ export default function CategorizedProducts({ tag }) {
     return null; // Don't render anything if there are no products for the tag
   }
 
-  const handleProductClick = (productId) => {
-    router.push(`/product/${productId}`);
-  };
+  
 
   return (
-    <div className={`max-w-6xl mx-auto p-6 ${theme.text}`}>
-      <h2 className="text-2xl font-bold mb-4 capitalize">{tag}</h2>
+    <div className={`w-full px-4 mt-6 sm:mt-8 ${theme.text}`}>
+      <h2 className="text-3xl font-bold mb-6 capitalize">{tag}</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {products.map((product) => (
-          <div
-            key={product._id}
-            className={`border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer ${theme.card} ${theme.border}`}
-            onClick={() => handleProductClick(product._id)}
-          >
-            <div className={`relative w-full pb-[100%] ${theme.imageBg}`}>
-              <img
-                src={product.imageUrl || imagee}
-                alt={product.title}
-                className="absolute inset-0 w-full h-full object-contain"
-              />
-            </div>
-
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
-              <p className={`${theme.mutedText} text-sm mb-3 line-clamp-2`}>
-                {product.description}
-              
-              </p>
-              {product.price && (
-                <p className={`${theme.success} font-bold`}>
-                  💰 {product.price} NPR
-                </p>
-              )}
-            </div>
-          </div>
+          <ProductShow key={product._id} product={product} />
         ))}
       </div>
     </div>

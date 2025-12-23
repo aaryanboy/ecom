@@ -23,6 +23,8 @@ const Header = () => {
   const customerLinks = [
     { name: "Home", path: "/" },
     { name: "Cart", path: "/cart" },
+    { name: "Orders", path: "/orders" },
+    { name: "Profile", path: "/profile" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -31,6 +33,7 @@ const Header = () => {
     { name: "Sales", path: "/owner/sales" },
     { name: "Manage Post", path: "/owner/post" },
     { name: "Reports", path: "/owner/reports" },
+    { name: "Profile", path: "/owner/profile" },
     { name: "Settings", path: "/settings" },
   ];
 
@@ -50,6 +53,11 @@ const Header = () => {
               {user?.isOwner ? "MyShop (Owner)" : "MyShop"}
             </Link>
             <ThemeButton />
+            {user && (
+              <Link href={user.isOwner ? "/owner/profile" : "/profile"} className={`text-sm ${theme.mutedText} hover:underline`}>
+                Hi, {user.username || user.email}
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center gap-4 flex-1 justify-center">

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import ProductCard from "@/components/ProductCard";
+import ProductShow from "@/components/ProductShow";
 
 export default function ProductList() {
   const { theme } = useTheme();
@@ -85,7 +85,7 @@ export default function ProductList() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductShow key={product._id} product={product} />
         ))}
       </div>
 
