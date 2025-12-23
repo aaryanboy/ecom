@@ -31,7 +31,11 @@ export default function CategorizedProducts({ tag }) {
   }
 
   if (products.length === 0) {
-    return null; // Don't render anything if there are no products for the tag
+    return (
+      <div className="a">hello
+      {products}
+      </div>
+    ); // Don't render anything if there are no products for the tag
   }
 
   

@@ -28,6 +28,7 @@ const categories = JSON.parse(process.env.NEXT_PUBLIC_CATEGORIES);
                       {categories.map((category) => (
                         <CategorizedProducts key={category} tag={category} />
                       ))}
+                      
                     </section>
           </section>
         </div>
