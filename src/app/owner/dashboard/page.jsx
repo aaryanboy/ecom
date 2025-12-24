@@ -10,8 +10,13 @@ export default function OwnerDashboard() {
   const [stats, setStats] = useState({ totalRevenue: 0, totalOrders: 0, averageOrderValue: 0 });
   const [orders, setOrders] = useState({ pending: [], shipped: [], delivered: [] });
 
+  const [lastUpdated, setLastUpdated] = useState("");
+
   useEffect(() => {
+    setLastUpdated(new Date().toLocaleTimeString());
     const fetchData = async () => {
+      // ... rest of fetch logic
+
       try {
         const [payRes, ordRes] = await Promise.all([
           fetch("/api/owner/payments"),
@@ -47,7 +52,7 @@ export default function OwnerDashboard() {
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
           <div className="text-sm text-slate-500">
-            Last updated: {new Date().toLocaleTimeString()}
+            Last updated: {lastUpdated}
           </div>
         </header>
 
@@ -66,9 +71,9 @@ export default function OwnerDashboard() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { label: "Total Revenue", value: `$${stats.totalRevenue.toFixed(2)}`, color: "border-l-4 border-green-500" },
+                { label: "Total Revenue", value: `Rs. ${stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, color: "border-l-4 border-green-500" },
                 { label: "Total Orders", value: stats.totalOrders, color: "border-l-4 border-blue-500" },
-                { label: "Avg. Order Value", value: `$${stats.averageOrderValue.toFixed(2)}`, color: "border-l-4 border-purple-500" },
+                { label: "Avg. Order Value", value: `Rs. ${stats.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, color: "border-l-4 border-purple-500" },
               ].map((stat, idx) => (
                 <div key={idx} className={`${theme.surface} ${theme.shadow} ${theme.border} border rounded-xl p-6 ${stat.color} hover:shadow-md transition-shadow`}>
                   <p className={`text-sm font-medium ${theme.mutedText} uppercase tracking-wider`}>{stat.label}</p>
@@ -81,17 +86,17 @@ export default function OwnerDashboard() {
             <div className={`${theme.surface} ${theme.shadow} ${theme.border} border rounded-xl overflow-hidden`}>
               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-semibold text-lg">Order History</h3>
-                <span className={`text-xs ${theme.mutedText}`}>Recent transactions</span>
+                <span className={`text-sm ${theme.mutedText}`}>Recent transactions</span>
               </div>
               <div className="overflow-x-auto">
-                <table className="min-w-full text-sm text-left">
+                <table className="min-w-full text-base text-left">
                   <thead className="bg-gray-50/50">
                     <tr>
-                      <th className="px-6 py-4 font-medium text-slate-500">Order ID</th>
-                      <th className="px-6 py-4 font-medium text-slate-500">User</th>
-                      <th className="px-6 py-4 font-medium text-slate-500">Amount</th>
-                      <th className="px-6 py-4 font-medium text-slate-500">Date</th>
-                      <th className="px-6 py-4 font-medium text-slate-500">Status</th>
+                      <th className="px-6 py-4 font-semibold text-slate-600">Order ID</th>
+                      <th className="px-6 py-4 font-semibold text-slate-600">User</th>
+                      <th className="px-6 py-4 font-semibold text-slate-600">Amount</th>
+                      <th className="px-6 py-4 font-semibold text-slate-600">Date</th>
+                      <th className="px-6 py-4 font-semibold text-slate-600">Status</th>
                     </tr>
                   </thead>
                   <tbody className={`divide-y ${theme.divide}`}>
@@ -99,12 +104,12 @@ export default function OwnerDashboard() {
                       <tr><td className="px-6 py-8 text-center text-slate-400" colSpan={5}>No orders found.</td></tr>
                     ) : orders.delivered.map((o) => (
                       <tr key={o._id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-6 py-4 font-mono text-xs">{o.transactionId || o._id.substring(0, 8)}...</td>
-                        <td className="px-6 py-4">{o.userId}</td>
-                        <td className="px-6 py-4 font-medium">${(o.amount || 0).toFixed(2)}</td>
-                        <td className="px-6 py-4 text-slate-500">{new Date(o.createdAt).toLocaleDateString()}</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <td className="px-6 py-5 font-mono text-sm">{o.transactionId || o._id.substring(0, 8)}...</td>
+                        <td className="px-6 py-5">{o.userId}</td>
+                        <td className="px-6 py-5 font-medium">Rs. {(o.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td className="px-6 py-5 text-slate-500">{new Date(o.createdAt).toLocaleDateString()}</td>
+                        <td className="px-6 py-5">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                             Delivered
                           </span>
                         </td>

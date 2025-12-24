@@ -170,14 +170,41 @@ export async function GET(req) {
 
     console.log(`Payment details stored for transaction: ${transactionCode}`);
 
-    // Decrement inventory for purchased items
+    // Decrement inventory AND Track User Interests
     for (const item of purchaseItems) {
       if (!item.productId || !item.quantity) continue;
       const product = await Post.findById(item.productId);
       if (!product) continue;
+
+      // 1. Decrement Inventory
       const current = product.amount || 0;
       product.amount = Math.max(0, current - item.quantity);
       await product.save();
+
+      // 2. Track Interest (Buy Event)
+      if (userId) {
+        try {
+          const user = await User.findOne({ email: userId });
+          if (user) {
+            const weight = 10; // High score for buying
+            const tagsToTrack = [...(product.tags || []), product.category].filter(Boolean);
+
+            for (const tag of tagsToTrack) {
+              const existing = user.interests.find(i => i.tag === tag);
+              if (existing) {
+                existing.score += weight;
+                existing.lastInteracted = new Date();
+              } else {
+                user.interests.push({ tag, score: weight, lastInteracted: new Date() });
+              }
+            }
+            await user.save();
+          }
+        } catch (e) {
+          console.error("Failed to track interest on buy:", e);
+          // Don't block payment flow for analytics failure
+        }
+      }
     }
 
     // Clear cart only for cart-origin purchases (no buy-now meta present)

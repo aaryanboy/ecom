@@ -1,25 +1,46 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
+import { useAuth } from "@/app/(auth)/AuthContext";
 
 export default function ProductCard({ product, onClick, className = "" }) {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const router = useRouter();
   const fallbackImage = "/logo.svg";
+
+  const trackView = async () => {
+    // Debugging: Check what data we have
+    console.log("Tracking View For:", product.title, "Tags:", product.tags, "Category:", product.category);
+
+    if (user?.email && (product.tags?.length || product.category)) {
+      try {
+        const tags = [...(product.tags || []), product.category].filter(Boolean);
+        // Fire and forget
+        fetch("/api/analytics/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email, tags, type: "view" })
+        });
+      } catch (err) {
+        console.error("Tracking failed", err);
+      }
+    } else {
+      console.log("Skipping track: Missing user or tags");
+    }
+  };
 
   const handleClick = (e) => {
     // Prevent navigation if clicking on a button inside the card
     if (e.target.closest("button")) return;
 
+    trackView();
+
     if (onClick) onClick(product);
     else router.push(`/product/${product._id}`);
   };
 
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-    // TODO: Implement add to cart logic with context
-    console.log("Add to cart:", product.title);
-  };
+
 
   return (
     <div
@@ -34,14 +55,7 @@ export default function ProductCard({ product, onClick, className = "" }) {
           className="absolute inset-0 w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
         />
         {/* Overlay Action (Desktop) */}
-        <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex justify-center bg-gradient-to-t from-black/10 to-transparent">
-          <button
-            onClick={handleAddToCart}
-            className={`shadow-lg font-medium px-6 py-2 rounded-full text-sm transform active:scale-95 transition-all ${theme.button}`}
-          >
-            Add to Cart
-          </button>
-        </div>
+
       </div>
 
       {/* Content */}

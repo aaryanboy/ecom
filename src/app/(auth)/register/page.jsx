@@ -3,36 +3,57 @@
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
 export default function Register() {
   const { theme } = useTheme();
+  const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ name, email, password });
+    setError("");
+    setSuccess("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      const response = await axios.post("/api/auth/register", {
+      await axios.post("/api/auth/register", {
         name,
         email,
         password,
         confirmPassword,
       });
-      console.log("Registration successful:", response.data);
+
+      setSuccess("Account created successfully! Redirecting...");
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+
     } catch (error) {
-      if (error.response) {
-        console.log("Server responded with error:", error.response.data);
-      } else if (error.request) {
-        console.log("No response received:", error.request);
+      if (error.response && error.response.data && error.response.data.error) {
+        setError(error.response.data.error);
       } else {
-        console.log("Error setting up request:", error.message);
+        setError("Registration failed. Please try again.");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -40,6 +61,18 @@ export default function Register() {
     <div className={`flex items-center justify-center min-h-screen ${theme.background}`}>
       <div className={`${theme.card} p-8 rounded-lg shadow-md w-full max-w-md ${theme.text}`}>
         <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
+
+        {error && (
+          <div className="mb-4 p-3 rounded bg-red-100 border border-red-400 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 p-3 rounded bg-green-100 border border-green-400 text-green-700 text-sm">
+            {success}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -49,8 +82,10 @@ export default function Register() {
             <input
               type="text"
               name="name"
+              value={name}
               onChange={(e) => setName(e.target.value)}
               className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${theme.border} ${theme.focusRing}`}
+              required
             />
           </div>
 
@@ -59,10 +94,12 @@ export default function Register() {
               Email
             </label>
             <input
-              type="text"
+              type="email"
               name="email"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${theme.border} ${theme.focusRing}`}
+              required
             />
           </div>
 
@@ -73,8 +110,10 @@ export default function Register() {
             <input
               type="password"
               name="password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${theme.border} ${theme.focusRing}`}
+              required
             />
           </div>
 
@@ -85,17 +124,20 @@ export default function Register() {
             <input
               type="password"
               name="confirmPassword"
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${theme.border} ${theme.focusRing}`}
+              required
             />
           </div>
 
           <div className="flex items-center justify-between mt-6">
             <button
               type="submit"
-              className={`${theme.button} px-4 py-2 rounded ${theme.buttonHover} ${theme.textHover} transition`}
+              disabled={isLoading}
+              className={`${theme.button} px-4 py-2 rounded ${theme.buttonHover} ${theme.textHover} transition disabled:opacity-50`}
             >
-              Register
+              {isLoading ? "Registering..." : "Register"}
             </button>
 
             <Link href="/login" className={`${theme.link} hover:underline`}>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ThemeButton from "@/components/layout/ThemeButton";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
@@ -9,6 +10,7 @@ import SearchBar from "@/components/search/SearchBar";
 const Header = () => {
   const { theme } = useTheme();
   const { user, logout, loading } = useAuth();
+  const pathname = usePathname();
 
   if (loading) {
     return null;
@@ -16,15 +18,14 @@ const Header = () => {
 
   const loggedOutLinks = [
     { name: "Home", path: "/" },
-    { name: "Contact", path: "/contact" },
   ];
 
   const customerLinks = [
     { name: "Home", path: "/" },
+    { name: "For You", path: "/foryou" },
     { name: "Cart", path: "/cart" },
     { name: "Orders", path: "/orders" },
     { name: "Profile", path: "/profile" },
-    { name: "Contact", path: "/contact" },
   ];
 
   const ownerLinks = [
@@ -61,15 +62,21 @@ const Header = () => {
 
           {/* Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${theme.text} hover:bg-black/5 dark:hover:bg-white/10`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.path}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive
+                      ? "bg-amber-600/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500"
+                      : `${theme.text} hover:bg-black/5 dark:hover:bg-white/10`
+                    }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Actions */}

@@ -27,6 +27,24 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (user?.email && product) {
+      console.log("[ProductPage] Opening Product:", product.title);
+      // Track View
+      if (product.tags?.length || product.category) {
+        console.log("[ProductPage] Tracking Tags:", product.tags, "Category:", product.category);
+        const tags = [...(product.tags || []), product.category].filter(Boolean);
+        fetch("/api/analytics/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email, tags, type: "view" })
+        }).catch(err => console.error("Tracking Error:", err));
+      } else {
+        console.warn("[ProductPage] No tags to track!");
+      }
+    }
+  }, [user, product]);
+
   const handleAddToCart = async () => {
     setAdding(true);
     if (!user?.email) {
@@ -80,9 +98,9 @@ export default function ProductDetail() {
           <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
           <p className={`${theme.mutedText} mb-5`}>{product.description}</p>
 
-        {product.price && (
+          {product.price && (
             <p className={`text-2xl font-semibold ${theme.success} mb-6`}>
-              💰 {product.price} NPR
+              💰 Rs. {product.price.toLocaleString()}
             </p>
           )}
 
@@ -154,10 +172,10 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      
-      <Similar productId={product._id} subCategory={product.subCategory || ""} tags={product.tags || []} /> 
 
-      
+      <Similar productId={product._id} subCategory={product.subCategory || ""} tags={product.tags || []} />
+
+
     </div>
   );
 }
