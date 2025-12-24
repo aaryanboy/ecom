@@ -2,74 +2,80 @@
 import Link from "next/link";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
-const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || "Your Store";
+const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || "MyShop";
 
 export default function FooterSuggested() {
   const { theme } = useTheme();
   const year = new Date().getFullYear();
 
   return (
-    <footer className={`border-t mt-12 ${theme.card} ${theme.text}`}>
-      <div className="max-w-6xl mx-auto px-4 py-10 grid gap-8 sm:grid-cols-2 md:grid-cols-4">
-        <div>
+    <footer className={`border-t mt-auto ${theme.surface} ${theme.text} ${theme.border}`}>
+      <div className="max-w-7xl mx-auto px-4 py-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Brand Column */}
+        <div className="space-y-4">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt={STORE_NAME} className="h-6 w-6" />
-            <span className="font-semibold">{STORE_NAME}</span>
+            <img src="/logo.svg" alt={STORE_NAME} className="h-8 w-8" />
+            <span className="text-xl font-bold tracking-tight">{STORE_NAME}</span>
           </Link>
-          <p className={`mt-3 text-sm ${theme.mutedText}`}>
-            Quality products, secure checkout, friendly support.
+          <p className={`text-sm leading-relaxed ${theme.mutedText}`}>
+            Your one-stop destination for premium products. Quality verified, secure checkout, and fast delivery.
           </p>
         </div>
 
+        {/* Links Column 1 */}
         <div>
-          <h4 className="font-semibold">Shop</h4>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li><Link href="/products" className={theme.link}>All Products</Link></li>
-            <li><Link href="/tags/sale" className={theme.link}>Sale</Link></li>
-            <li><Link href="/tags/new" className={theme.link}>New Arrivals</Link></li>
-            <li><Link href="/tags/bestsellers" className={theme.link}>Bestsellers</Link></li>
+          <h4 className={`font-semibold mb-4 ${theme.text}`}>Shop</h4>
+          <ul className="space-y-2 text-sm">
+            <li><Link href="/products" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>All Products</Link></li>
+            <li><Link href="/tags/sale" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>Flash Sale</Link></li>
+            <li><Link href="/tags/new" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>New Arrivals</Link></li>
+            <li><Link href="/tags/bestsellers" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>Bestsellers</Link></li>
           </ul>
         </div>
 
+        {/* Links Column 2 */}
         <div>
-          <h4 className="font-semibold">Help</h4>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li><Link href="/help/shipping" className={theme.link}>Shipping Info</Link></li>
-            <li><Link href="/help/returns" className={theme.link}>Returns & Refunds</Link></li>
-            <li><Link href="/help/faq" className={theme.link}>FAQ</Link></li>
-            <li><Link href="/orders/track" className={theme.link}>Order Tracking</Link></li>
+          <h4 className={`font-semibold mb-4 ${theme.text}`}>Customer Care</h4>
+          <ul className="space-y-2 text-sm">
+            <li><Link href="/help" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>Help Center</Link></li>
+            <li><Link href="/orders/track" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>Track Your Order</Link></li>
+            <li><Link href="/returns" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>Returns & Refunds</Link></li>
+            <li><Link href="/contact" className={`transition-colors ${theme.mutedText} ${theme.textHover}`}>Contact Us</Link></li>
           </ul>
         </div>
 
+        {/* Contact Column */}
         <div>
-          <h4 className="font-semibold">Contact</h4>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li><a href="mailto:support@example.com" className={theme.link}>support@example.com</a></li>
-            <li><a href="tel:+977-9800000000" className={theme.link}>+977 9800000000</a></li>
-            <li><Link href="/contact" className={theme.link}>Contact Form</Link></li>
-            <li className="flex gap-3">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className={theme.link}>Instagram</a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className={theme.link}>Facebook</a>
+          <h4 className={`font-semibold mb-4 ${theme.text}`}>Stay Connected</h4>
+          <ul className="space-y-3 text-sm">
+            <li className="flex items-center gap-2">
+              <span className={theme.mutedText}>Email:</span>
+              <a href="mailto:support@myshop.com" className={`font-medium ${theme.link}`}>support@myshop.com</a>
+            </li>
+            <li className="flex gap-4 mt-4">
+              <a href="#" className={`p-2 rounded-full ${theme.imageBg} hover:opacity-80 transition-opacity`}>
+                {/* Social Icon Placeholder */}
+                <div className="w-5 h-5 bg-blue-600 rounded-sm"></div>
+              </a>
+              <a href="#" className={`p-2 rounded-full ${theme.imageBg} hover:opacity-80 transition-opacity`}>
+                {/* Social Icon Placeholder */}
+                <div className="w-5 h-5 bg-pink-600 rounded-sm"></div>
+              </a>
             </li>
           </ul>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pb-8">
-        <div className={`flex flex-wrap items-center justify-between gap-3 border-t pt-6 ${theme.border}`}>
-          <div className="flex items中心 gap-3">
-            <img src="/logo.svg" alt="eSewa" className="h-5 w-5" />
-            <span className="text-sm">Secure payments with eSewa</span>
-          </div>
-          <div className={`text-xs ${theme.mutedText}`}>
-            <Link href="/legal/privacy" className={`mr-3 ${theme.link}`}>Privacy</Link>
-            <Link href="/legal/terms" className={`mr-3 ${theme.link}`}>Terms</Link>
-            <Link href="/sitemap.xml" className={theme.link}>Sitemap</Link>
+      <div className={`border-t ${theme.divide}`}>
+        <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+          <p className={theme.mutedText}>
+            © {year} {STORE_NAME}. All rights reserved.
+          </p>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className={`${theme.mutedText} hover:text-amber-600`}>Privacy Policy</Link>
+            <Link href="/terms" className={`${theme.mutedText} hover:text-amber-600`}>Terms of Service</Link>
           </div>
         </div>
-        <p className={`mt-4 text-xs ${theme.mutedText}`}>
-          © {year} {STORE_NAME}. All rights reserved.
-        </p>
       </div>
     </footer>
   );

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Cart from "@/models/cart";
+import User from "@/models/User";
 import Post from "@/models/Post";
 import connectToDatabase from "@/lib/db";
 
@@ -23,15 +23,16 @@ export async function POST(req) {
       );
     }
 
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
-    if (!cart) {
+    // Find user by email
+    const user = await User.findOne({ email: userId }).populate('cart.productId');
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Cart not found' },
+        { success: false, message: 'User not found' },
         { status: 404 }
       );
     }
 
-    const item = cart.items.find(i => i._id.toString() === itemId);
+    const item = user.cart.find(i => i._id.toString() === itemId);
     if (!item) {
       return NextResponse.json(
         { success: false, message: 'Item not found in cart' },
@@ -50,9 +51,9 @@ export async function POST(req) {
     const available = product.amount || 0;
     const newQty = Math.min(quantity, available);
     item.quantity = newQty;
-    await cart.save();
+    await user.save();
 
-    return NextResponse.json({ success: true, cart });
+    return NextResponse.json({ success: true, cart: user.cart });
   } catch (error) {
     console.error('Error updating cart item:', error);
     return NextResponse.json(

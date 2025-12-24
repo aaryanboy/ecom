@@ -1,6 +1,6 @@
 // src/app/api/cart/remove/route.js
 import { NextResponse } from "next/server";
-import Cart from "@/models/cart";
+import User from "@/models/User";
 import connectToDatabase from "@/lib/db";
 
 export async function POST(req) {
@@ -16,24 +16,24 @@ export async function POST(req) {
       );
     }
 
-    // Find user's cart
-    const cart = await Cart.findOne({ userId });
-    
-    if (!cart) {
+    // Find user
+    const user = await User.findOne({ email: userId });
+
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Cart not found' },
+        { success: false, message: 'User not found' },
         { status: 404 }
       );
     }
 
     // Remove the item from the cart
-    cart.items = cart.items.filter(item => item._id.toString() !== itemId);
-    await cart.save();
+    user.cart = user.cart.filter(item => item._id.toString() !== itemId);
+    await user.save();
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Item removed from cart',
-      cart
+      cart: user.cart
     });
   } catch (error) {
     console.error('Error removing item from cart:', error);

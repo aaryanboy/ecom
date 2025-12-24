@@ -1,6 +1,6 @@
 // src/app/api/payment/verify/route.js
 import { NextResponse } from "next/server";
-import Cart from "@/models/cart";
+import User from "@/models/User";
 import Payment from "@/models/Payment";
 import Order from "@/models/Order";
 import Post from "@/models/Post";
@@ -135,9 +135,10 @@ export async function GET(req) {
         computedCartTotal = (product.price || 0) * buyNowQty;
       }
     } else {
-      const cart = await Cart.findOne({ userId }).populate('items.productId');
-      if (cart && cart.items && cart.items.length > 0) {
-        purchaseItems = cart.items.map(item => ({
+      const user = await User.findOne({ email: userId }).populate('cart.productId');
+      const cartItems = user?.cart || [];
+      if (cartItems.length > 0) {
+        purchaseItems = cartItems.map(item => ({
           productId: item.productId?._id,
           name: item.productId?.title,
           price: item.productId?.price || 0,
@@ -182,7 +183,7 @@ export async function GET(req) {
     // Clear cart only for cart-origin purchases (no buy-now meta present)
     if (!buyNowProductId) {
       console.log(`Clearing cart for user: ${userId}`);
-      await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+      await User.findOneAndUpdate({ email: userId }, { $set: { cart: [] } });
     }
 
     console.log("Payment successful, redirecting to success page");

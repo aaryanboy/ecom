@@ -148,7 +148,7 @@ export default function CartClient() {
             <p className="mb-4">Your cart is empty</p>
             <Link
               href="/"
-              className={`px-4 py-2 rounded ${theme.background} ${theme.buttonHover} transition`}
+              className={`px-6 py-2.5 rounded-full font-medium ${theme.button} ${theme.buttonHover} transition-all shadow-md transform hover:scale-105`}
             >
               Continue Shopping
             </Link>

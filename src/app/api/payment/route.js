@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import Cart from "@/models/cart";
+import User from "@/models/User";
 import Post from "@/models/Post";
 import connectToDatabase from "@/lib/db";
 import { generateEsewaSignature } from "@/lib/generateEsewaSignature";
@@ -45,11 +45,11 @@ export async function POST(req) {
       }
       transactionUuidSuffix = userId;
     } else {
-      const cart = await Cart.findOne({ userId }).populate("items.productId");
-      if (!cart || cart.items.length === 0) {
+      const user = await User.findOne({ email: userId }).populate("cart.productId");
+      if (!user || !user.cart || user.cart.length === 0) {
         return NextResponse.json({ success: false, message: "Cart is empty" }, { status: 400 });
       }
-      for (const item of cart.items) {
+      for (const item of user.cart) {
         if (item.productId && item.productId.price) {
           totalAmount += (item.productId.price || 0) * (item.quantity || 1);
         }
@@ -77,7 +77,7 @@ export async function POST(req) {
     const signature = generateEsewaSignature(ESEWA_SECRET_KEY, signatureString);
     const formData = { ...esewaConfig, signature };
 
-    const htmlForm = `<!DOCTYPE html><html><head><title>Redirecting to eSewa...</title><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}.loader{border:5px solid #f3f3f3;border-top:5px solid #3498db;border-radius:50%;width:50px;height:50px;animation:spin 2s linear infinite;margin-bottom:20px}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style></head><body><div class="loader"></div><p>Redirecting to eSewa payment gateway...</p><form id="esewaForm" method="POST" action="${ESEWA_API_URL}">${Object.entries(formData).map(([k,v]) => `<input type="hidden" name="${k}" value="${v}" />`).join("")}</form><script>document.getElementById('esewaForm').submit();</script></body></html>`;
+    const htmlForm = `<!DOCTYPE html><html><head><title>Redirecting to eSewa...</title><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}.loader{border:5px solid #f3f3f3;border-top:5px solid #3498db;border-radius:50%;width:50px;height:50px;animation:spin 2s linear infinite;margin-bottom:20px}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style></head><body><div class="loader"></div><p>Redirecting to eSewa payment gateway...</p><form id="esewaForm" method="POST" action="${ESEWA_API_URL}">${Object.entries(formData).map(([k, v]) => `<input type="hidden" name="${k}" value="${v}" />`).join("")}</form><script>document.getElementById('esewaForm').submit();</script></body></html>`;
 
     return new NextResponse(htmlForm, { headers: { "Content-Type": "text/html" } });
   } catch (error) {

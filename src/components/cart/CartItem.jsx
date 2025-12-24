@@ -7,7 +7,7 @@ export default function CartItem({ item, theme, onRemove, onUpdateQty }) {
         <img src={item.imageUrl || '/logo.svg'} alt={item.name} className="w-16 h-16 object-cover rounded" />
         <div>
           <h3 className={`font-medium ${theme.text}`}>{item.name}</h3>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className={`flex items-center gap-2 text-sm ${theme.secondaryText}`}>
             <span>Qty:</span>
             <input
               type="number"
@@ -15,9 +15,9 @@ export default function CartItem({ item, theme, onRemove, onUpdateQty }) {
               max={item.stock ?? 99}
               value={item.quantity}
               onChange={(e) => onUpdateQty?.(item._id, parseInt(e.target.value || '1', 10))}
-              className="w-16 border rounded px-2 py-1"
+              className={`w-16 border rounded px-2 py-1 ${theme.inputBorder} bg-transparent ${theme.text}`}
             />
-            {item.stock === 0 && <span className="text-red-500 ml-2">Out of stock</span>}
+            {item.stock === 0 && <span className={`${theme.danger} ml-2`}>Out of stock</span>}
           </div>
           <p className={`${theme.text}`}>NPR {item.price}</p>
         </div>

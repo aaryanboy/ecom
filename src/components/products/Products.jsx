@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import ProductShow from "@/components/products/ProductShow";
+import ProductCard from "@/components/products/ProductCard";
 
 export default function ProductList() {
   const { theme } = useTheme();
@@ -76,14 +76,14 @@ export default function ProductList() {
   }
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 mt-6 sm:mt-8 ${theme.text}`}>
+    <div className={`w-full px-1 ${theme.text}`}>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">All Products</h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <ProductShow key={product._id} product={product} />
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 

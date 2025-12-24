@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import ProductShow from "@/components/products/ProductShow";
+import ProductCard from "@/components/products/ProductCard";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
 export default function CategorizedProducts({ tag }) {
@@ -25,7 +25,7 @@ export default function CategorizedProducts({ tag }) {
     return (
       <div className={`flex items-center justify-center ${theme.background} ${theme.text}`}>
         <div className={`animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 ${theme.spinnerBorder}`}></div>
-        
+
       </div>
     );
   }
@@ -33,18 +33,18 @@ export default function CategorizedProducts({ tag }) {
   if (products.length === 0) {
     return (
       <div className="a">hello
-      {products}
+        {products}
       </div>
     );
   }
 
   return (
-    <div className={`w-full px-4 mt-6 sm:mt-8 ${theme.text}`}>
+    <div className={`w-full px-1 mt-6 sm:mt-8 ${theme.text}`}>
       <h2 className="text-3xl font-bold mb-6 capitalize">{tag}</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <ProductShow key={product._id} product={product} />
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
     </div>

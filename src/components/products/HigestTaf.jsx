@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
-import ProductShow from "@/components/products/ProductShow";
+import ProductCard from "@/components/products/ProductCard";
 
 export default function HigestTaf({ limit = 4 }) {
   const { theme } = useTheme();
@@ -79,11 +79,11 @@ export default function HigestTaf({ limit = 4 }) {
   const goToPage = (p) => setPage(Math.min(Math.max(1, p), totalPages));
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 mt-12 ${theme.text}`}>
+    <div className={`w-full px-1 mt-8 ${theme.text}`}>
       <h2 className="text-2xl font-bold mb-4">Popular in #{topTag}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {currentItems.map((product) => (
-          <ProductShow key={product._id} product={product} />
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 

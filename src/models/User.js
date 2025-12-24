@@ -28,6 +28,14 @@ const UserSchema = new mongoose.Schema({
     }
   ],
 
+  // Cart (Refactored from separate collection)
+  cart: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
+      quantity: { type: Number, default: 1 },
+    }
+  ],
+
   // Recommendations
 }, { timestamps: true });
 
