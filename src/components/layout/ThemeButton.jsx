@@ -10,14 +10,14 @@ const ThemeButton = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="rounded-md transition"
+      className="rounded-md transition p-2"
       aria-label="Toggle theme"
     >
       <Image
         src={isDark ? "/moon-light.svg" : "/sun.svg"}
         alt={isDark ? "Dark Mode" : "Light Mode"}
-        width={15}
-        height={15}
+        width={24}
+        height={24}
       />
     </button>
   );

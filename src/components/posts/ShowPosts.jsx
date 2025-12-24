@@ -6,6 +6,7 @@ import { useTheme } from "@/app/(theme)/ThemeContext";
 export default function ShowPosts() {
   const [posts, setPosts] = useState([]);
   const [selected, setSelected] = useState(new Set());
+  const [page, setPage] = useState(1);
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -113,7 +114,13 @@ export default function ShowPosts() {
     <div className="col-span-2 text-center">Actions</div>
   </div>
   
-  {posts.map((post) => (
+  {(() => {
+    const limit = 10;
+    const totalPages = Math.max(1, Math.ceil(posts.length / limit));
+    const start = (page - 1) * limit;
+    const currentItems = posts.slice(start, start + limit);
+    const items = currentItems;
+    return items.map((post) => (
     <div
       key={post._id}
       className={`grid grid-cols-12 gap-4 px-6 py-4 border-b cursor-pointer hover:shadow-md transition ${theme.card} ${theme.border}`}
@@ -198,10 +205,11 @@ export default function ShowPosts() {
             const ok = confirm('Delete this post? This will also remove images.');
             if (!ok) return;
             try {
-              const res = await fetch(`/api/owner/post/${post._id}`, { method: 'DELETE' });
+              const res = await fetch('/api/owner/post/bulk-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [post._id] }) });
               const data = await res.json();
               if (res.ok && data.ok) {
                 setPosts((prev) => prev.filter((p) => p._id !== post._id));
+                setSelected((prev) => { const next = new Set(prev); next.delete(post._id); return next; });
                 alert('🗑️ Post deleted');
               } else {
                 alert('❌ Failed to delete');
@@ -217,8 +225,59 @@ export default function ShowPosts() {
         </button>
       </div>
     </div>
-  ))}
+  ))
+  })()}
       </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-center gap-2 mt-6">
+          {(() => {
+            const limit = 10;
+            const totalPages = Math.max(1, Math.ceil(posts.length / limit));
+            const goToPage = (p) => setPage(Math.min(Math.max(1, p), totalPages));
+            return (
+              <>
+                <button
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page <= 1}
+                  className={`px-3 py-2 rounded ${theme.button} ${theme.buttonHover}`}
+                >
+                  ← Previous
+                </button>
+                {(() => {
+                  const candidates = [page - 1, page, page + 1].filter((p) => p >= 1 && p <= totalPages);
+                  while (candidates.length < 3 && candidates[0] > 1) {
+                    candidates.unshift(candidates[0] - 1);
+                  }
+                  while (candidates.length < 3 && candidates[candidates.length - 1] < totalPages) {
+                    candidates.push(candidates[candidates.length - 1] + 1);
+                  }
+                  const uniq = Array.from(new Set(candidates));
+                  return uniq.map((p) => {
+                    const isCurrent = p === page;
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => goToPage(p)}
+                        className={`px-3 py-2 rounded border ${theme.border} ${isCurrent ? 'font-bold underline' : ''}`}
+                      >
+                        {p}
+                      </button>
+                    );
+                  });
+                })()}
+                <button
+                  onClick={() => goToPage(page + 1)}
+                  disabled={page >= totalPages}
+                  className={`px-3 py-2 rounded ${theme.button} ${theme.buttonHover}`}
+                >
+                  Next →
+                </button>
+              </>
+            );
+          })()}
+        </div>
       </div>
     </div>
   );

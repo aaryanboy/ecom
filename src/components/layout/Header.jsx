@@ -50,7 +50,6 @@ const Header = () => {
             <Link href="/" className="text-lg font-bold tracking-tight">
               {user?.isOwner ? "MyShop (Owner)" : "MyShop"}
             </Link>
-            <ThemeButton />
             {user && (
               <Link href={user.isOwner ? "/owner/profile" : "/profile"} className={`text-sm ${theme.mutedText} hover:underline`}>
                 Hi, {user.username || user.email}
@@ -79,6 +78,8 @@ const Header = () => {
                 <SearchBar className="relative mb-0" />
               </div>
             )}
+
+            <ThemeButton />
 
             {user ? (
               <button
