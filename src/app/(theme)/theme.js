@@ -1,6 +1,8 @@
 // App/theme.js
 
 export const lightTheme = {
+
+  theme: "light",
   // Layout
   background: "bg-gray-50",
   surface: "bg-white",
@@ -10,6 +12,7 @@ export const lightTheme = {
   modal: "bg-white",
   imageBg: "bg-gray-100",
   overlay: "bg-black/40",
+  bar: "via-black",
 
   // Text
   text: "text-slate-900",
@@ -39,13 +42,15 @@ export const lightTheme = {
   danger: "text-rose-700 bg-rose-50",
   warning: "text-amber-700 bg-amber-50",
 
-  // Effects
+  // Effects via-slate-300
   shadow: "shadow-sm",
   shadowHover: "hover:shadow-lg",
   ring: "ring-slate-200",
 };
 
 export const darkTheme = {
+
+  theme: "dark",
   // Layout
   background: "bg-slate-950",
   surface: "bg-slate-900",
@@ -55,6 +60,7 @@ export const darkTheme = {
   modal: "bg-slate-900",
   imageBg: "bg-slate-800",
   overlay: "bg-black/60",
+  bar: "via-slate-600",
 
   // Text
   text: "text-slate-100",

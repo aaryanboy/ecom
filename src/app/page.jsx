@@ -3,6 +3,8 @@
 import { useTheme } from "./(theme)/ThemeContext";
 import Products from "@/components/products/Products";
 import HigestTaf from "@/components/products/HigestTaf";
+import ForYouHome from "@/components/products/ForYouHome";
+
 import CategorySidebar from "@/components/categories/CategorySidebar";
 import CategorizedProducts from "@/components/products/CategorizedProducts";
 
@@ -33,13 +35,27 @@ export default function Home() {
           <main className="md:col-span-3 space-y-12 min-w-0">
             {/* Hero Section or Banner could go here */}
 
-            <section>
-              <HigestTaf limit={4} />
+
+            <section >
+              <ForYouHome />
             </section>
+
+            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
 
             <section>
               <Products />
             </section>
+
+            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
+            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
+
+            <section>
+              <HigestTaf limit={4} />
+            </section>
+
+
+            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
+            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
 
             {categories.length > 0 && (
               <section className="space-y-12">

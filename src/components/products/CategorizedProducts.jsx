@@ -39,14 +39,18 @@ export default function CategorizedProducts({ tag }) {
   }
 
   return (
-    <div className={`w-full px-1 mt-6 sm:mt-8 ${theme.text}`}>
-      <h2 className="text-3xl font-bold mb-6 capitalize">{tag}</h2>
+    <>
+      <div className={`w-full px-1 mt-6 sm:mt-8 ${theme.text}`}>
+        <h2 className="text-3xl font-bold mb-6 capitalize">{tag}</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
       </div>
-    </div>
+      <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
+
+    </>
   );
 }
