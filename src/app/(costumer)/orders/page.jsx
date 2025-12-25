@@ -17,7 +17,7 @@ export default function CustomerOrdersPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/customer/orders");
+        const res = await fetch("/api/user/orders");
         const data = await res.json();
         if (!res.ok || !data.ok) throw new Error(data.error || "Failed to load orders");
 

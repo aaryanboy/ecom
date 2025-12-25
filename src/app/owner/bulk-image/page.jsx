@@ -54,7 +54,7 @@ export default function BulkImageReplacePage() {
                   const fd = new FormData();
                   fd.append("file", file);
                   fd.append("fileName", file.name || "image.jpg");
-                  const upRes = await fetch("/api/media/upload", { method: "POST", body: fd });
+                  const upRes = await fetch("/api/owner/media/upload", { method: "POST", body: fd });
                   const upData = await upRes.json();
                   if (!upRes.ok || !upData.ok) {
                     alert("Failed to upload image");

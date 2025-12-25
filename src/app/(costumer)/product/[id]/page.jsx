@@ -20,7 +20,7 @@ export default function ProductDetail() {
   const imagee = "/logo.svg";
 
   useEffect(() => {
-    fetch(`/api/post/${id}`)
+    fetch(`/api/products/${id}`)
       .then((res) => res.json())
       .then((data) => setProduct(data))
       .catch((err) => console.error("❌ Failed to fetch product:", err))
@@ -34,7 +34,7 @@ export default function ProductDetail() {
       if (product.tags?.length || product.category) {
         console.log("[ProductPage] Tracking Tags:", product.tags, "Category:", product.category);
         const tags = [...(product.tags || []), product.category].filter(Boolean);
-        fetch("/api/analytics/track", {
+        fetch("/api/user/analytics/track", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user.email, tags, type: "view" })

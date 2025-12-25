@@ -13,7 +13,7 @@ export default function EditPost() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    fetch(`/api/post/${id}`)
+    fetch(`/api/products/${id}`)
       .then((res) => res.json())
       .then((data) => setPost(data))
       .catch((err) => console.error("Error fetching post:", err));
@@ -52,7 +52,7 @@ export default function EditPost() {
         const fd = new FormData();
         fd.append("file", imageFile);
         fd.append("fileName", imageFile.name);
-        const res = await fetch("/api/media/upload", { method: "POST", body: fd });
+        const res = await fetch("/api/owner/media/upload", { method: "POST", body: fd });
         const uploaded = await res.json();
         if (!res.ok || !uploaded?.ok) {
           throw new Error(uploaded?.error || "Upload failed");

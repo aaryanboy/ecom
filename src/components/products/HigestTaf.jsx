@@ -17,14 +17,14 @@ export default function HigestTaf({ limit = 4 }) {
     const load = async () => {
       setLoading(true);
       try {
-        const firstRes = await fetch(`/api/posts?page=1&limit=${pageLimit}`);
+        const firstRes = await fetch(`/api/products/list?page=1&limit=${pageLimit}`);
         const firstData = await firstRes.json();
         const firstPosts = Array.isArray(firstData) ? firstData : (firstData.posts || []);
         const total = Array.isArray(firstData) ? firstPosts.length : (firstData.total || firstPosts.length);
         const totalPages = Math.max(1, Math.ceil(total / pageLimit));
         let all = [...firstPosts];
         for (let p = 2; p <= totalPages; p++) {
-          const res = await fetch(`/api/posts?page=${p}&limit=${pageLimit}`);
+          const res = await fetch(`/api/products/list?page=${p}&limit=${pageLimit}`);
           const data = await res.json();
           const posts = Array.isArray(data) ? data : (data.posts || []);
           all = all.concat(posts);

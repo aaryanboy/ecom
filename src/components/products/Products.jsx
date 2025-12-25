@@ -18,7 +18,7 @@ export default function ProductList() {
       setLoading(true);
       try {
         console.log("[Home] Fetching All Products", { page, limit });
-        const res = await fetch(`/api/posts?page=${page}&limit=${limit}`);
+        const res = await fetch(`/api/products/list?page=${page}&limit=${limit}`);
         const data = await res.json();
         const posts = Array.isArray(data) ? data : data.posts;
         const totalCount = Array.isArray(data) ? data.length : data.total;

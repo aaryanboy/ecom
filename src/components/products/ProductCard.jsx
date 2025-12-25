@@ -17,7 +17,7 @@ export default function ProductCard({ product, onClick, className = "" }) {
       try {
         const tags = [...(product.tags || []), product.category].filter(Boolean);
         // Fire and forget
-        fetch("/api/analytics/track", {
+        fetch("/api/user/analytics/track", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user.email, tags, type: "view" })

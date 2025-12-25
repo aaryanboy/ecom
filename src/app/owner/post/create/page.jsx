@@ -36,7 +36,7 @@ export default function CreatePost() {
         const fd = new FormData();
         fd.append("file", imageFile);
         fd.append("fileName", imageFile.name);
-        const res = await fetch("/api/media/upload", { method: "POST", body: fd });
+        const res = await fetch("/api/owner/media/upload", { method: "POST", body: fd });
         const uploaded = await res.json();
         if (!res.ok || !uploaded?.ok) {
           throw new Error(uploaded?.error || "Upload failed");

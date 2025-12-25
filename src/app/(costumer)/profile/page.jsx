@@ -14,14 +14,14 @@ export default function CustomerProfilePage() {
     const load = async () => {
       try {
         const [ordersRes, profRes] = await Promise.all([
-          fetch("/api/customer/orders"),
-          fetch("/api/profile"),
+          fetch("/api/user/orders"),
+          fetch("/api/user/profile"),
         ]);
         const ordersData = await ordersRes.json();
         if (ordersRes.ok && ordersData.ok) setOrderCount((ordersData.pending?.length || 0) + (ordersData.shipped?.length || 0) + (ordersData.delivered?.length || 0));
         const profileData = await profRes.json();
         if (profRes.ok && profileData.ok) setProfile({ username: profileData.user.username || "", addresses: profileData.user.addresses || [] });
-      } catch {}
+      } catch { }
     };
     if (!loading) load();
   }, [loading]);
@@ -95,7 +95,7 @@ export default function CustomerProfilePage() {
                 onClick={async () => {
                   setSaving(true);
                   try {
-                    const res = await fetch("/api/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: profile.username, addresses: profile.addresses }) });
+                    const res = await fetch("/api/user/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: profile.username, addresses: profile.addresses }) });
                     const data = await res.json();
                     if (res.ok && data.ok) setProfile({ username: data.user.username || "", addresses: data.user.addresses || [] });
                   } finally {

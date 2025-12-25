@@ -12,7 +12,7 @@ export default function ShowPost() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`/api/post/${id}`)
+    fetch(`/api/products/${id}`)
       .then((res) => res.json())
       .then((data) => setPost(data))
       .catch((err) => console.error("Error fetching post:", err))
