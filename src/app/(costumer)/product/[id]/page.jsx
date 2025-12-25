@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
-import { addToCart, buyNow } from "@/lib/addToCart";
+import { addToCart, buyNow } from "@/lib/cart";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import Similar from "@/components/products/Similar";
 

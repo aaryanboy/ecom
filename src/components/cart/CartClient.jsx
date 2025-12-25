@@ -6,11 +6,11 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import Link from "next/link";
 import {
-  fetchCartApi,
-  removeCartItemApi,
-  checkoutApi,
-  updateCartItemApi,
-} from "@/lib/cartClient";
+  fetchCart as fetchCartApi,
+  removeCartItem as removeCartItemApi,
+  checkout as checkoutApi,
+  updateCartItem as updateCartItemApi,
+} from "@/lib/cart";
 import PaymentMessage from "@/components/cart/PaymentMessage";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";

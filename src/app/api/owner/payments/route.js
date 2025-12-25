@@ -1,39 +1,23 @@
-// app/api/owner/payments/route.js
 import { NextResponse } from "next/server";
-import connectToDatabase from "@/lib/db";
-import User from "@/models/User";
+import { requireOwner } from "@/lib/auth";
 import Payment from "@/models/Payment";
 
 export async function GET(req) {
-  try {
-    await connectToDatabase();
+  const { user, error } = await requireOwner(req);
+  if (error) return error;
 
-    const sessionToken = req.cookies.get("session")?.value;
-    if (!sessionToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const payments = await Payment.find({ status: "success" }).lean();
 
-    const user = await User.findOne({ sessionToken });
-    if (!user || !user.isOwner) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+  const totalOrders = payments.length;
+  const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-    const payments = await Payment.find({ status: "success" }).lean();
-
-    const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-    const totalOrders = payments.length;
-    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-
-    return NextResponse.json({
-      ok: true,
-      stats: {
-        totalRevenue,
-        totalOrders,
-        averageOrderValue,
-      },
-    });
-  } catch (err) {
-    console.error("Error fetching owner payments:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+  return NextResponse.json({
+    ok: true,
+    stats: {
+      totalRevenue,
+      totalOrders,
+      averageOrderValue,
+    },
+  });
 }
