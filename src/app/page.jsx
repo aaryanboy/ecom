@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useTheme } from "./(theme)/ThemeContext";
 import Products from "@/components/products/Products";
 import HigestTaf from "@/components/products/HigestTaf";
@@ -27,7 +28,9 @@ export default function Home() {
           {/* Sidebar - Hidden on mobile, sticky on desktop */}
           <aside className="hidden md:block md:col-span-1">
             <div className="sticky top-24">
-              <CategorySidebar />
+              <Suspense fallback={<div className="animate-pulse h-48 bg-gray-200 rounded-lg" />}>
+                <CategorySidebar />
+              </Suspense>
             </div>
           </aside>
 
