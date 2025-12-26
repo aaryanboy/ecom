@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 const statusBadge = {
   "on the way": "bg-blue-100 text-blue-700",
@@ -39,6 +40,10 @@ export default function CustomerOrdersPage() {
     <div className={`min-h-screen py-6 ${theme.background} ${theme.text}`}>
       {/* Centered Container with spacing */}
       <div className="max-w-6xl mx-auto px-4">
+        <Breadcrumb items={[
+          { label: "Home", href: "/" },
+          { label: "Your Orders", current: true }
+        ]} />
         <h1 className="text-2xl font-bold mb-6">Your Orders</h1>
 
         {error && (

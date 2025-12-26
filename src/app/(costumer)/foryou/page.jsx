@@ -5,6 +5,7 @@ import { useAuth } from "@/app/(auth)/AuthContext";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import ProductCard from "@/components/products/ProductCard";
 import CategorySidebar from "@/components/categories/CategorySidebar";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function ForYouPage() {
     const { user, loading } = useAuth();
@@ -57,6 +58,10 @@ export default function ForYouPage() {
     return (
         <div className={`min-h-screen pb-12 ${theme.background} ${theme.text}`}>
             <div className="w-full px-2 sm:px-4 py-8">
+                <Breadcrumb items={[
+                    { label: "Home", href: "/" },
+                    { label: "For You", current: true }
+                ]} />
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
                     {/* Reuse Sidebar for consistency */}

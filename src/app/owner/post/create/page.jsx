@@ -14,6 +14,7 @@ export default function CreatePost() {
   const [imageFile, setImageFile] = useState(null);
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -27,6 +28,11 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent double submissions
+    if (submitting) return;
+    setSubmitting(true);
+
     let imagePath = null;
     let imageUrl = null;
 
@@ -46,12 +52,14 @@ export default function CreatePost() {
       } catch (err) {
         console.error("Upload error:", err);
         alert("❌ Failed to upload image. Please try again.");
+        setSubmitting(false);
         return;
       }
     }
 
     if (!category || !subCategory) {
       alert("Select category and sub-category");
+      setSubmitting(false);
       return;
     }
 
@@ -67,6 +75,7 @@ export default function CreatePost() {
       alert("✅ Post created successfully!");
       router.push(`/owner/post/show/${data._id}`);
     } else {
+      setSubmitting(false);
       alert("❌ Error: " + data.error);
     }
   };
@@ -206,9 +215,10 @@ export default function CreatePost() {
         {/* Submit */}
         <button
           type="submit"
-          className={`w-full py-3 rounded-lg font-medium transition ${theme.button} ${theme.buttonHover}`}
+          disabled={submitting}
+          className={`w-full py-3 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${theme.button} ${theme.buttonHover}`}
         >
-          🚀 Create Post
+          {submitting ? "Creating..." : "🚀 Create Post"}
         </button>
       </form>
     </div>

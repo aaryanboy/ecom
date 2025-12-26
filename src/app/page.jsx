@@ -8,6 +8,7 @@ import ForYouHome from "@/components/products/ForYouHome";
 
 import CategorySidebar from "@/components/categories/CategorySidebar";
 import CategorizedProducts from "@/components/products/CategorizedProducts";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -23,6 +24,9 @@ export default function Home() {
     <div className={`min-h-screen pb-12 ${theme.background} ${theme.text}`}>
       {/* Hero / Main Layout */}
       <div className="w-full px-2 sm:px-4 py-8">
+        <Breadcrumb items={[
+          { label: "Home", current: true }
+        ]} />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
           {/* Sidebar - Hidden on mobile, sticky on desktop */}
@@ -50,14 +54,12 @@ export default function Home() {
             </section>
 
             <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
-            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
 
             <section>
               <HigestTaf limit={4} />
             </section>
 
 
-            <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
             <div className={`w-full h-px bg-gradient-to-r from-transparent ${theme.bar} to-transparent my-8`} />
 
             {categories.length > 0 && (

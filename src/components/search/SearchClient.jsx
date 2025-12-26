@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import ProductCard from "@/components/products/ProductCard";
 import CategorySidebar from "@/components/categories/CategorySidebar";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function SearchClient() {
   const { theme } = useTheme();
@@ -39,7 +40,11 @@ export default function SearchClient() {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className={`w-full px-2 ${theme.text}`}>
+    <div className={`w-full px-2 py-8 ${theme.text}`}>
+      <Breadcrumb items={[
+        { label: "Home", href: "/" },
+        { label: q || "Search", current: true }
+      ]} />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <aside className="md:col-span-1">
           <CategorySidebar />
@@ -71,9 +76,8 @@ export default function SearchClient() {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`px-3 py-2 rounded border ${theme.border} ${
-                    p === page ? "font-bold underline" : ""
-                  }`}
+                  className={`px-3 py-2 rounded border ${theme.border} ${p === page ? "font-bold underline" : ""
+                    }`}
                 >
                   {p}
                 </button>

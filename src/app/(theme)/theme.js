@@ -46,6 +46,25 @@ export const lightTheme = {
   shadow: "shadow-sm",
   shadowHover: "hover:shadow-lg",
   ring: "ring-slate-200",
+
+  // Stock Status Badges
+  stockHigh: "bg-emerald-600 text-white",
+  stockLow: "bg-amber-500 text-white",
+  stockOut: "bg-red-600 text-white",
+
+  // Category & Subcategory Badges
+  categoryBadge: "bg-blue-600 text-white",
+  subCategoryBadge: "bg-purple-600 text-white",
+
+  // Tags
+  tag: "bg-slate-200 text-slate-700",
+  tagHover: "hover:scale-105",
+
+  // Price
+  priceText: "text-amber-600",
+
+  // Info Box (for price cards, etc.)
+  infoBox: "bg-slate-100",
 };
 
 export const darkTheme = {
@@ -94,4 +113,23 @@ export const darkTheme = {
   shadow: "shadow-none",
   shadowHover: "hover:bg-slate-800",
   ring: "ring-slate-800",
+
+  // Stock Status Badges
+  stockHigh: "bg-emerald-600 text-white",
+  stockLow: "bg-amber-500 text-white",
+  stockOut: "bg-red-600 text-white",
+
+  // Category & Subcategory Badges
+  categoryBadge: "bg-blue-600 text-white",
+  subCategoryBadge: "bg-purple-600 text-white",
+
+  // Tags
+  tag: "bg-slate-700 text-white",
+  tagHover: "hover:scale-105",
+
+  // Price
+  priceText: "text-amber-400",
+
+  // Info Box (for price cards, etc.)
+  infoBox: "bg-slate-800",
 };

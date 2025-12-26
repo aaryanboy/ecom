@@ -14,6 +14,7 @@ import {
 import PaymentMessage from "@/components/cart/PaymentMessage";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function CartClient() {
   const router = useRouter();
@@ -109,6 +110,10 @@ export default function CartClient() {
     return (
       <div className="min-h-screen pt-24 px-4 flex justify-center">
         <div className="w-full max-w-4xl">
+          <Breadcrumb items={[
+            { label: "Home", href: "/" },
+            { label: "Your Cart", current: true }
+          ]} />
           <h1 className={`text-2xl font-bold mb-6 ${theme.text}`}>
             Your Cart
           </h1>
@@ -123,6 +128,10 @@ export default function CartClient() {
     return (
       <div className="min-h-screen pt-24 px-4 flex justify-center">
         <div className="w-full max-w-4xl">
+          <Breadcrumb items={[
+            { label: "Home", href: "/" },
+            { label: "Your Cart", current: true }
+          ]} />
           <h1 className={`text-2xl font-bold mb-6 ${theme.text}`}>
             Your Cart
           </h1>
@@ -141,6 +150,10 @@ export default function CartClient() {
     return (
       <div className="min-h-screen pt-24 px-4 flex justify-center">
         <div className="w-full max-w-4xl">
+          <Breadcrumb items={[
+            { label: "Home", href: "/" },
+            { label: "Your Cart", current: true }
+          ]} />
           <h1 className={`text-2xl font-bold mb-6 ${theme.text}`}>
             Your Cart
           </h1>
@@ -162,6 +175,10 @@ export default function CartClient() {
   return (
     <div className="min-h-screen pt-24 px-4 flex justify-center">
       <div className="w-full max-w-4xl">
+        <Breadcrumb items={[
+          { label: "Home", href: "/" },
+          { label: "Your Cart", current: true }
+        ]} />
         <h1 className={`text-2xl font-bold mb-6 ${theme.text}`}>
           Your Cart
         </h1>
