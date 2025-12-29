@@ -20,6 +20,7 @@ A modern, full-featured e-commerce platform built with **Next.js**, **MongoDB**,
 - 📸 **Bulk Image Upload** - Efficiently manage product images
 - 👥 **Customer Insights** - View customer activity and logs
 - 📋 **Order Management** - Process and track customer orders
+ hello world
 
 ---
 
