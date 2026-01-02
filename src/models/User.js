@@ -39,9 +39,21 @@ const UserSchema = new mongoose.Schema({
   // Recommendations
   interests: [
     {
-      tag: { type: String, required: true },
-      score: { type: Number, default: 0 },
-      lastInteracted: { type: Date, default: Date.now }
+      category: { type: String, required: true },
+      lastInteractionAt: { type: Date, default: Date.now },
+      subcategories: [
+        {
+          name: { type: String, required: true },
+          lastInteractionAt: { type: Date, default: Date.now },
+          tags: [
+            {
+              name: { type: String, required: true },
+              weight: { type: Number, default: 0 },
+              lastInteractionAt: { type: Date, default: Date.now }
+            }
+          ]
+        }
+      ]
     }
   ]
 }, { timestamps: true });

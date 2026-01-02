@@ -20,7 +20,19 @@ export async function POST(req) {
 
     const token = crypto.randomBytes(16).toString("hex");
     existingUser.sessionToken = token;
-    await existingUser.save();
+    try {
+      await existingUser.save();
+    } catch (saveError) {
+      console.warn("User save failed, checking for schema incompatibility...", saveError.message);
+      // Migration: If interests are invalid (old schema), reset them
+      if (saveError.message && saveError.message.includes("interests")) {
+        console.log("Migrating user interests to new schema (resetting)...");
+        existingUser.interests = [];
+        await existingUser.save();
+      } else {
+        throw saveError;
+      }
+    }
 
     const response = NextResponse.json(
       { message: "Login successful", user: { email: existingUser.email, isOwner: existingUser.isOwner } },

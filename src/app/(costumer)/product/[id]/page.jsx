@@ -31,12 +31,16 @@ export default function ProductDetail() {
     if (user?.email && product) {
       console.log("[ProductPage] Opening Product:", product.title);
       if (product.tags?.length || product.category) {
-        console.log("[ProductPage] Tracking Tags:", product.tags, "Category:", product.category);
-        const tags = [...(product.tags || []), product.category].filter(Boolean);
+        const { category, subCategory, tags } = product;
+        console.log("[ProductPage] Tracking:", { category, subCategory, tags });
         fetch("/api/user/analytics/track", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: user.email, tags, type: "view" })
+          body: JSON.stringify({
+            email: user.email,
+            product: { category, subCategory, tags }, // Send full structure
+            type: "view"
+          })
         }).catch(err => console.error("Tracking Error:", err));
       } else {
         console.warn("[ProductPage] No tags to track!");
