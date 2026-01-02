@@ -24,7 +24,7 @@ export default function SalesPage() {
         //check error
         if (!res.ok || !data.ok) throw new Error(data.error || "Failed to load orders");
 
-        
+
         setOrders({ pending: data.pending || [], shipped: data.shipped || [] });
       } catch (err) {
         setError(err.message);
@@ -53,7 +53,7 @@ export default function SalesPage() {
           return { pending, shipped };
         });
       }
-    } catch (_) {}
+    } catch (_) { }
   };
 
   return (
@@ -118,7 +118,7 @@ export default function SalesPage() {
                         >
                           <td className="px-3 py-2">{o.transactionId}</td>
                           <td className="px-3 py-2">{o.userId}</td>
-                          <td className="px-3 py-2">${(o.amount || 0).toFixed(2)}</td>
+                          <td className="px-3 py-2">Rs. {(o.amount || 0).toFixed(2)}</td>
                           <td className="px-3 py-2">{new Date(o.createdAt).toLocaleString()}</td>
                           <td className="px-3 py-2">
                             <span className={`text-xs px-2 py-1 rounded-full ${statusBadge.pending}`}>
@@ -177,7 +177,7 @@ export default function SalesPage() {
                         >
                           <td className="px-3 py-2">{o.transactionId}</td>
                           <td className="px-3 py-2">{o.userId}</td>
-                          <td className="px-3 py-2">${(o.amount || 0).toFixed(2)}</td>
+                          <td className="px-3 py-2">Rs. {(o.amount || 0).toFixed(2)}</td>
                           <td className="px-3 py-2">{new Date(o.createdAt).toLocaleString()}</td>
                           <td className="px-3 py-2">
                             <span className={`text-xs px-2 py-1 rounded-full ${statusBadge.shipped}`}>
