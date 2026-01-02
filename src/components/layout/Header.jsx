@@ -32,9 +32,7 @@ const Header = () => {
     { name: "Dashboard", path: "/owner/dashboard" },
     { name: "Sales", path: "/owner/sales" },
     { name: "Manage Post", path: "/owner/post" },
-    { name: "Reports", path: "/owner/reports" },
     { name: "Profile", path: "/owner/profile" },
-    { name: "Settings", path: "/settings" },
   ];
 
   const navLinks = !user
@@ -69,8 +67,8 @@ const Header = () => {
                   key={link.name}
                   href={link.path}
                   className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive
-                      ? "bg-amber-600/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500"
-                      : `${theme.text} hover:bg-black/5 dark:hover:bg-white/10`
+                    ? "bg-amber-600/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500"
+                    : `${theme.text} hover:bg-black/5 dark:hover:bg-white/10`
                     }`}
                 >
                   {link.name}
