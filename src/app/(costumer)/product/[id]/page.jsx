@@ -235,7 +235,7 @@ export default function ProductDetail() {
                     <button
                       onClick={handleAddToCart}
                       disabled={adding}
-                      className="flex-1 py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${theme.button} ${theme.buttonHover}`}
                     >
                       {adding ? "Adding..." : "🛒 Add to Cart"}
                     </button>
