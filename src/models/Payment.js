@@ -27,7 +27,7 @@ const PaymentSchema = new mongoose.Schema({
   items: [{
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Post',
     },
     name: String,
     price: Number,

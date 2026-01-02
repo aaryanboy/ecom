@@ -8,13 +8,7 @@ import connectToDatabase from "@/lib/db";
 import { generateEsewaSignature } from "@/lib/generateEsewaSignature";
 import { updateUserInterests } from "@/lib/recommendationUtils";
 
-// Get the base URL with correct port
-const getBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    return window.location.origin;
-  }
-  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-};
+import { getBaseUrl } from "@/lib/utils";
 
 export async function GET(req) {
   try {
@@ -192,34 +186,61 @@ export async function GET(req) {
       items: purchaseItems,
     });
 
+    // Decrement inventory AND Track User Interests
+    // Optimized: Fetch user once, update in memory, save once.
+    let user = null;
+    if (userId) {
+      user = await User.findOne({ email: userId });
+    }
+
+    const bulkOps = [];
+
     for (const item of purchaseItems) {
       if (!item.productId || !item.quantity) continue;
 
-      const product = await Post.findById(item.productId);
-      if (!product) continue;
-
-      product.amount = Math.max(
-        0,
-        (product.amount || 0) - item.quantity
-      );
-      await product.save();
-
-      try {
-        const user = await User.findOne({ email: userId });
-        if (user) {
-          await updateUserInterests(user, product, "buy");
-          await user.save();
+      // Update inventory (we could use bulkWrite for this too, but for now individual saves are okay-ish, or better: atomic update)
+      // Atomic update is safer: increment -quantity
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: item.productId },
+          update: { $inc: { amount: -item.quantity } }
         }
-      } catch (e) {
-        console.error("Failed to track interest on buy:", e);
+      });
+
+      // Track Interest (Buy Event)
+      if (user) {
+        // We need the full product details. Since we have productId, we might need to fetch it if we don't have category info in purchaseItems. 
+        // purchaseItems came from `Post.findById` or `user.cart.populate`.
+        // The `item` object here is from `purchaseItems`. 
+        // Wait, `purchaseItems` constructed above:
+        // if buyNow: [{ productId: product._id, name, price, quantity }] -> MISSING category/subCategory
+        // if cart: map(...) -> MISSING category/subCategory
+
+        // CRITICAL FIX: We need category info to track interests properly.
+        // We should fetch products with full details or ensure purchaseItems has them.
+        // Let's rely on finding product by ID to get the fresh data for interest tracking.
+        const product = await Post.findById(item.productId);
+        if (product) {
+          await updateUserInterests(user, product, "buy");
+        }
       }
     }
 
-    if (!buyNowProductId) {
-      await User.findOneAndUpdate(
-        { email: userId },
-        { $set: { cart: [] } }
-      );
+    if (bulkOps.length > 0) {
+      await Post.bulkWrite(bulkOps);
+    }
+
+    if (user) {
+      // Clear cart if not buy-now
+      if (!buyNowProductId) {
+        user.cart = [];
+        console.log(`Clearing cart for user: ${userId}`);
+      }
+      try {
+        await user.save();
+      } catch (e) {
+        console.error("Failed to save user updates (interests/cart):", e);
+      }
     }
 
     return NextResponse.redirect(

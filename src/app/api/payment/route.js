@@ -5,7 +5,7 @@ import Post from "@/models/Post";
 import connectToDatabase from "@/lib/db";
 import { generateEsewaSignature } from "@/lib/generateEsewaSignature";
 
-const getBaseUrl = () => process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+import { getBaseUrl } from "@/lib/utils";
 const ESEWA_MERCHANT_ID = process.env.ESEWA_MERCHANT_ID || "EPAYTEST";
 const ESEWA_SECRET_KEY = process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q";
 const ESEWA_SUCCESS_URL = `${getBaseUrl()}/api/payment/verify`;
