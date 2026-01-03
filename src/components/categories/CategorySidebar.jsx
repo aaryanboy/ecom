@@ -28,8 +28,10 @@ export default function CategorySidebar({ title = "Shop by Category", categories
                 className={`w-full text-left px-3 py-2 rounded transition-colors ${isActive
                     ? "bg-amber-600/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500 font-medium"
                     : `${theme.buttonHover} ${theme.text}`
+                    //hello
                   }`}
               >
+
                 {cat}
               </button>
             </li>
