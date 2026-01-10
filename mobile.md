@@ -754,14 +754,7 @@ eas build --platform android --profile production
 eas build --platform ios --profile production
 ```
 
-### 15.2 Environment Configs
-
-| Environment | API URL | eSewa Mode |
-|-------------|---------|------------|
-| Development | http://localhost:3000 | test |
-| Staging | https://staging.example.com | test |
-| Production | https://api.example.com | production |
-
+###
 ---
 
 ## 16. Key Implementation Notes
@@ -771,6 +764,961 @@ eas build --platform ios --profile production
 3. **Product Images**: Stored in Supabase bucket `images`, referenced by `imagePath` and `imageUrl`
 4. **Cart Storage**: Embedded in User document, not separate collection
 5. **Recommendations**: Tracked automatically on product view/purchase
+
+---
+
+---
+
+## 17. Mobile UI/UX Specifications
+
+This section provides detailed UI specifications for each mobile screen to ensure visual consistency with the web application.
+
+---
+
+### 17.1 Design System Overview
+
+#### Core Design Principles
+| Principle | Implementation |
+|-----------|----------------|
+| **Brand Colors** | Amber primary (#D97706 light, #F59E0B dark), with emerald accents for success actions |
+| **Typography** | Bold headers, clean body text, gradient text for brand elements |
+| **Corners** | Rounded corners (`borderRadius: 12-24`) for cards, buttons, badges |
+| **Shadows** | Subtle shadows in light mode, minimal in dark mode |
+| **Spacing** | Consistent 4/8/12/16/24px spacing scale |
+
+#### Component Library Structure
+
+```javascript
+// Mobile Component Mapping
+const COMPONENTS = {
+  // Navigation
+  BottomTabBar: "Bottom navigation with 5 tabs",
+  Header: "Sticky top header with search",
+  Breadcrumb: "Navigation trail on detail pages",
+  
+  // Products
+  ProductCard: "Grid/list product display",
+  ProductGrid: "2-column responsive grid",
+  ProductImage: "Aspect-ratio image container",
+  
+  // Actions
+  Button: "Primary/Secondary/Ghost variants",
+  QuantitySelector: "Stepper with +/- buttons",
+  
+  // Feedback
+  LoadingSpinner: "Animated loading indicator",
+  EmptyState: "Illustrated empty views",
+  Badge: "Status/category badges"
+};
+```
+
+---
+
+### 17.2 Bottom Tab Navigation
+
+The mobile app uses a **Bottom Tab Bar** instead of the web header navigation.
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│           [Main Content Area]           │
+│                                         │
+├─────────────────────────────────────────┤
+│  🏠    🔍    🛒    ❤️    👤            │
+│ Home  Search Cart  ForYou Profile       │
+└─────────────────────────────────────────┘
+```
+
+#### Tab Configuration
+
+| Tab | Icon | Label | Route | Badge |
+|-----|------|-------|-------|-------|
+| Home | 🏠 `home-outline` | Home | `/home` | - |
+| Search | 🔍 `search-outline` | Search | `/search` | - |
+| Cart | 🛒 `cart-outline` | Cart | `/cart` | Cart item count |
+| For You | ❤️ `heart-outline` | For You | `/foryou` | - |
+| Profile | 👤 `person-outline` | Profile | `/profile` | - |
+
+#### Tab Styling
+
+```javascript
+const TabBarStyle = {
+  // Container
+  container: {
+    height: 64,
+    backgroundColor: theme.surface,
+    borderTopWidth: 1,
+    borderTopColor: theme.border,
+    paddingBottom: 8, // Safe area
+  },
+  
+  // Active Tab
+  activeTab: {
+    color: theme.primary, // Amber
+    fontWeight: '600',
+  },
+  
+  // Inactive Tab
+  inactiveTab: {
+    color: theme.mutedText,
+  },
+  
+  // Cart Badge
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: '#DC2626', // Red
+    color: 'white',
+    fontSize: 10,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+  }
+};
+```
+
+---
+
+### 17.3 Top Header Bar
+
+A sticky header appears on all screens with contextual content.
+
+```
+┌─────────────────────────────────────────┐
+│  MyShop           [🔍 Search...]   [☀️] │
+└─────────────────────────────────────────┘
+```
+
+#### Header Layout
+
+```javascript
+const HeaderLayout = {
+  // Home Screen
+  home: {
+    left: "Logo (MyShop - gradient amber text)",
+    center: "SearchBar (expandable)",
+    right: "ThemeToggle button"
+  },
+  
+  // Detail Screen
+  detail: {
+    left: "← Back button",
+    center: "Page title",
+    right: "Share/ThemeToggle"
+  },
+  
+  // Auth Screens
+  auth: {
+    left: "Logo only",
+    center: null,
+    right: null
+  }
+};
+```
+
+#### Search Bar Component
+
+```javascript
+// SearchBar styling (matches web)
+const SearchBarStyle = {
+  container: {
+    flex: 1,
+    height: 40,
+    backgroundColor: theme.imageBg,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+    fontSize: 14,
+    color: theme.text,
+  },
+  icon: {
+    color: theme.mutedText,
+    marginRight: 8,
+  },
+  // Autocomplete dropdown
+  suggestions: {
+    position: 'absolute',
+    top: 48,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.surface,
+    borderRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    maxHeight: 300,
+  }
+};
+```
+
+---
+
+### 17.4 Home Screen Layout
+
+```
+┌─────────────────────────────────────────┐
+│  MyShop           [🔍........]     [☀️] │ ← Header
+├─────────────────────────────────────────┤
+│  ▼ Categories                           │ ← Collapsible Sidebar
+│  ├─ Electronics & Appliances            │
+│  ├─ Fashion                             │
+│  └─ [See all →]                         │
+├─────────────────────────────────────────┤
+│  ✨ For You                             │ ← Section with horizontal scroll
+│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐       │
+│  │     │ │     │ │     │ │     │ →     │
+│  │ 📦  │ │ 📦  │ │ 📦  │ │ 📦  │       │
+│  │Rs.X │ │Rs.X │ │Rs.X │ │Rs.X │       │
+│  └─────┘ └─────┘ └─────┘ └─────┘       │
+├─────────────────────────────────────────┤
+│  ─────────── Divider ───────────        │
+├─────────────────────────────────────────┤
+│  🛍️ All Products                        │ ← 2-column grid
+│  ┌─────┐ ┌─────┐                        │
+│  │     │ │     │                        │
+│  │ 📦  │ │ 📦  │                        │
+│  │Rs.X │ │Rs.X │                        │
+│  └─────┘ └─────┘                        │
+│  ┌─────┐ ┌─────┐                        │
+│  │     │ │     │                        │
+│  │ 📦  │ │ 📦  │                        │
+│  └─────┘ └─────┘                        │
+└─────────────────────────────────────────┘
+```
+
+#### Section Headers
+
+```javascript
+const SectionHeader = {
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.text,
+  },
+  seeAll: {
+    fontSize: 14,
+    color: theme.primary,
+    fontWeight: '500',
+  }
+};
+```
+
+#### Horizontal Product Scroll
+
+```javascript
+// For "For You" and "Trending" sections
+const HorizontalScroll = {
+  container: {
+    paddingLeft: 16,
+    paddingRight: 8,
+  },
+  contentContainer: {
+    gap: 12,
+  },
+  card: {
+    width: 150, // Fixed width for horizontal scroll
+  }
+};
+```
+
+---
+
+### 17.5 Product Card Component
+
+Matches the web ProductCard design exactly.
+
+```
+┌─────────────────────┐
+│  ┌───────────────┐  │
+│  │               │  │ ← 4:5 aspect ratio
+│  │   [Image]     │  │    with contain fit
+│  │               │  │
+│  └───────────────┘  │
+│                     │
+│  Product Title      │ ← 2 line clamp
+│  that wraps...      │
+│                     │
+│  Rs. 1,999          │ ← Amber gradient text
+└─────────────────────┘
+```
+
+#### Card Styling
+
+```javascript
+const ProductCardStyle = {
+  container: {
+    backgroundColor: theme.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.border,
+    overflow: 'hidden',
+    // Press animation
+    transform: [{ scale: pressed ? 0.98 : 1 }],
+  },
+  
+  imageContainer: {
+    aspectRatio: 4/5,
+    backgroundColor: theme.imageBg,
+    padding: 16,
+  },
+  
+  image: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  
+  content: {
+    padding: 12,
+    gap: 8,
+  },
+  
+  title: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.text,
+    numberOfLines: 2,
+    lineHeight: 20,
+  },
+  
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.priceText, // Amber
+  }
+};
+```
+
+---
+
+### 17.6 Product Detail Screen
+
+```
+┌─────────────────────────────────────────┐
+│  ← Back              Product     [Share]│ ← Header
+├─────────────────────────────────────────┤
+│  Home / Electronics / Product Name      │ ← Breadcrumb
+├─────────────────────────────────────────┤
+│  ┌─────────────────────────────────────┐│
+│  │                                     ││
+│  │                                     ││
+│  │          [Product Image]            ││ ← Square aspect
+│  │                                     ││    with zoom gesture
+│  │                                     ││
+│  │                     [In Stock] ●    ││ ← Stock badge (top-right)
+│  └─────────────────────────────────────┘│
+├─────────────────────────────────────────┤
+│  [Category]  [Subcategory]              │ ← Badges
+│                                         │
+│  Product Title Here                     │ ← Large bold text
+│                                         │
+│  Product description text that explains │ ← Muted text
+│  the features and details...            │
+│                                         │
+│  ┌─────────────────────────────────────┐│
+│  │  Price                              ││ ← Info box
+│  │  Rs. 12,999        15 units avail.  ││
+│  └─────────────────────────────────────┘│
+│                                         │
+│  [#tag1] [#tag2] [#tag3]                │ ← Tag chips
+│                                         │
+├─────────────────────────────────────────┤
+│  Quantity:  [ - ]  3  [ + ]             │ ← Quantity selector
+│                                         │
+│  ┌─────────────────┐ ┌─────────────────┐│
+│  │  🛒 Add to Cart │ │  💰 Buy Now     ││ ← Action buttons
+│  └─────────────────┘ └─────────────────┘│
+├─────────────────────────────────────────┤
+│  Similar Products                       │
+│  ┌────┐ ┌────┐ ┌────┐ ┌────┐           │
+│  │    │ │    │ │    │ │    │ →         │
+│  └────┘ └────┘ └────┘ └────┘           │
+└─────────────────────────────────────────┘
+```
+
+#### Badge Styles
+
+```javascript
+const BadgeStyles = {
+  // Stock Status
+  stockHigh: {
+    backgroundColor: '#059669', // Emerald
+    color: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  stockLow: {
+    backgroundColor: '#F59E0B', // Amber
+  },
+  stockOut: {
+    backgroundColor: '#DC2626', // Red
+  },
+  
+  // Category/Subcategory
+  category: {
+    backgroundColor: '#2563EB', // Blue
+    color: 'white',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  subCategory: {
+    backgroundColor: '#9333EA', // Purple
+  },
+  
+  // Tags
+  tag: {
+    backgroundColor: theme.tag,
+    color: theme.tagText,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    fontSize: 14,
+    fontWeight: '500',
+  }
+};
+```
+
+#### Action Buttons
+
+```javascript
+const ActionButtons = {
+  // Add to Cart (Amber/Primary)
+  addToCart: {
+    flex: 1,
+    backgroundColor: theme.button,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    transform: [{ scale: pressed ? 0.98 : 1 }],
+  },
+  addToCartText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
+  // Buy Now (Emerald gradient)
+  buyNow: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    // Gradient background
+    background: 'linear-gradient(to right, #059669, #0D9488)',
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  buyNowText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  }
+};
+```
+
+---
+
+### 17.7 Cart Screen
+
+```
+┌─────────────────────────────────────────┐
+│  ← Back                Your Cart        │
+├─────────────────────────────────────────┤
+│  Home / Your Cart                       │ ← Breadcrumb
+├─────────────────────────────────────────┤
+│  ┌─────────────────────────────────────┐│
+│  │  ┌────┐                             ││
+│  │  │ 📦 │  Product Title              ││ ← Cart Item
+│  │  └────┘  Rs. 999                    ││
+│  │          Qty: [-] 2 [+]    [🗑️]     ││
+│  ├─────────────────────────────────────┤│
+│  │  ┌────┐                             ││
+│  │  │ 📦 │  Another Product            ││
+│  │  └────┘  Rs. 1,499                  ││
+│  │          Qty: [-] 1 [+]    [🗑️]     ││
+│  └─────────────────────────────────────┘│
+├─────────────────────────────────────────┤
+│  ┌─────────────────────────────────────┐│
+│  │  Subtotal:              Rs. 3,497   ││ ← Summary
+│  │  ─────────────────────────────────  ││
+│  │  Total:                 Rs. 3,497   ││
+│  │                                     ││
+│  │  ┌─────────────────────────────────┐││
+│  │  │       Proceed to Checkout       │││ ← Primary Button
+│  │  └─────────────────────────────────┘││
+│  └─────────────────────────────────────┘│
+└─────────────────────────────────────────┘
+```
+
+#### Cart Item Component
+
+```javascript
+const CartItemStyle = {
+  container: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: theme.imageBg,
+  },
+  
+  info: {
+    flex: 1,
+    gap: 4,
+  },
+  
+  title: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.text,
+    numberOfLines: 2,
+  },
+  
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.priceText,
+  },
+  
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  
+  quantityControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.border,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  
+  quantityButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: theme.surface,
+  },
+  
+  quantityText: {
+    paddingHorizontal: 16,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  
+  deleteButton: {
+    padding: 8,
+    color: theme.danger,
+  }
+};
+```
+
+#### Empty Cart State
+
+```javascript
+const EmptyCartStyle = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 64,
+  },
+  icon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 14,
+    color: theme.mutedText,
+    marginBottom: 24,
+  },
+  button: {
+    ...ActionButtons.addToCart,
+    paddingHorizontal: 24,
+  }
+};
+```
+
+---
+
+### 17.8 For You Screen
+
+```
+┌─────────────────────────────────────────┐
+│  ← Back                 For You         │
+├─────────────────────────────────────────┤
+│  Home / For You                         │
+├─────────────────────────────────────────┤
+│                                         │
+│  For You                                │ ← Large title
+│  Based on your recent interests...      │ ← Subtitle
+│                                         │
+│  ┌─────┐ ┌─────┐                        │ ← 2-column grid
+│  │     │ │     │                        │
+│  │ 📦  │ │ 📦  │                        │
+│  │Rs.X │ │Rs.X │                        │
+│  └─────┘ └─────┘                        │
+│  ┌─────┐ ┌─────┐                        │
+│  │     │ │     │                        │
+│  │ 📦  │ │ 📦  │                        │
+│  └─────┘ └─────┘                        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### Personalization Indicator
+
+```javascript
+const PersonalizationBanner = {
+  personalized: {
+    container: {
+      backgroundColor: theme.success,
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 16,
+    },
+    text: "✨ Based on your recent interests and purchases.",
+  },
+  recent: {
+    container: {
+      backgroundColor: theme.warning,
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 16,
+    },
+    text: "🔥 Discover our latest trending items.",
+  }
+};
+```
+
+---
+
+### 17.9 Profile Screen
+
+```
+┌─────────────────────────────────────────┐
+│  ← Back                 Profile         │
+├─────────────────────────────────────────┤
+│                                         │
+│         ┌─────────┐                     │
+│         │  Avatar │                     │ ← Circle avatar
+│         └─────────┘                     │
+│         User Name                       │
+│         user@email.com                  │
+│                                         │
+├─────────────────────────────────────────┤
+│  ┌─────────────────────────────────────┐│
+│  │  👤  Edit Profile                 → ││ ← Menu items
+│  ├─────────────────────────────────────┤│
+│  │  📍  Manage Addresses             → ││
+│  ├─────────────────────────────────────┤│
+│  │  📦  Order History                → ││
+│  ├─────────────────────────────────────┤│
+│  │  ☀️  Appearance               [🌙] ││ ← Theme toggle
+│  └─────────────────────────────────────┘│
+│                                         │
+│  ┌─────────────────────────────────────┐│
+│  │           🚪 Logout                 ││ ← Danger button
+│  └─────────────────────────────────────┘│
+└─────────────────────────────────────────┘
+```
+
+---
+
+### 17.10 Auth Screens (Login/Register)
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│                                         │
+│              MyShop                     │ ← Logo (gradient)
+│                                         │
+│  ┌─────────────────────────────────────┐│
+│  │                                     ││
+│  │           Login                     ││ ← Card container
+│  │                                     ││
+│  │  Email                              ││
+│  │  ┌─────────────────────────────────┐││
+│  │  │                                 │││ ← Input field
+│  │  └─────────────────────────────────┘││
+│  │                                     ││
+│  │  Password                           ││
+│  │  ┌─────────────────────────────────┐││
+│  │  │                                 │││
+│  │  └─────────────────────────────────┘││
+│  │                                     ││
+│  │  [Error message if any]             ││ ← Red text
+│  │                                     ││
+│  │  ┌─────────────┐                    ││
+│  │  │    Login    │  or register here  ││
+│  │  └─────────────┘                    ││
+│  └─────────────────────────────────────┘│
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### Input Field Styling
+
+```javascript
+const InputStyle = {
+  container: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.text,
+    marginBottom: 4,
+  },
+  input: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: theme.inputBorder,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: theme.text,
+    backgroundColor: theme.surface,
+  },
+  inputFocused: {
+    borderColor: theme.primary,
+    borderWidth: 2,
+    shadowColor: theme.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  error: {
+    borderColor: '#DC2626',
+  }
+};
+```
+
+---
+
+### 17.11 Orders Screen
+
+```
+┌─────────────────────────────────────────┐
+│  ← Back                 Orders          │
+├─────────────────────────────────────────┤
+│  Home / Orders                          │
+├─────────────────────────────────────────┤
+│  ┌─────────────────────────────────────┐│
+│  │  Order #TXN123456                   ││
+│  │  Jan 8, 2026                        ││
+│  │                                     ││
+│  │  ┌────┐ ┌────┐                      ││ ← Product thumbnails
+│  │  │ 📦 │ │ 📦 │  +2 more             ││
+│  │  └────┘ └────┘                      ││
+│  │                                     ││
+│  │  Total: Rs. 4,999                   ││
+│  │                                     ││
+│  │  [Payment: Paid ✓] [Delivery: 🚚]   ││ ← Status badges
+│  └─────────────────────────────────────┘│
+│                                         │
+│  ┌─────────────────────────────────────┐│
+│  │  Order #TXN123455                   ││
+│  │  ...                                ││
+│  └─────────────────────────────────────┘│
+└─────────────────────────────────────────┘
+```
+
+#### Order Status Badges
+
+```javascript
+const OrderStatusBadges = {
+  payment: {
+    paid: { bg: '#059669', text: 'Paid ✓' },
+    pending: { bg: '#F59E0B', text: 'Pending' },
+    failed: { bg: '#DC2626', text: 'Failed' },
+  },
+  delivery: {
+    delivered: { bg: '#059669', text: 'Delivered ✓' },
+    shipped: { bg: '#2563EB', text: 'Shipped 🚚' },
+    pending: { bg: '#F59E0B', text: 'Processing' },
+  }
+};
+```
+
+---
+
+### 17.12 Loading & Error States
+
+#### Loading Spinner
+
+```javascript
+const LoadingScreen = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.background,
+  },
+  spinner: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 4,
+    borderColor: theme.border,
+    borderTopColor: theme.primary, // Amber
+    // Animate: rotate 360deg infinite 0.8s linear
+  },
+  text: {
+    marginTop: 16,
+    fontSize: 16,
+    color: theme.mutedText,
+  }
+};
+```
+
+#### Error/Empty States
+
+```javascript
+const EmptyState = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  icon: {
+    fontSize: 64,
+    marginBottom: 16,
+    opacity: 0.5,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  message: {
+    fontSize: 14,
+    color: theme.mutedText,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  action: {
+    ...ActionButtons.addToCart,
+    paddingHorizontal: 24,
+  }
+};
+```
+
+---
+
+### 17.13 Modals & Overlays
+
+#### Confirm Modal (Buy Now)
+
+```javascript
+const ConfirmModal = {
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  container: {
+    backgroundColor: theme.modal,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 360,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 14,
+    color: theme.mutedText,
+    marginBottom: 24,
+  },
+  buttons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    ...ActionButtons.buttonSecondary,
+  },
+  confirmButton: {
+    flex: 1,
+    ...ActionButtons.buyNow,
+  }
+};
+```
+
+---
+
+### 17.14 Gesture & Animation Guidelines
+
+| Interaction | Animation | Duration |
+|-------------|-----------|----------|
+| Card Press | Scale down to 0.98 | 100ms |
+| Card Release | Scale back to 1.0 | 100ms |
+| Button Press | Scale down to 0.95 | 50ms |
+| Page Transition | Slide from right | 300ms |
+| Modal Open | Fade + scale from 0.9 | 200ms |
+| Pull to Refresh | Native spring | System |
+| Scroll | Native momentum | System |
+| Tab Switch | Crossfade | 150ms |
+
+#### Press Feedback Example
+
+```javascript
+// Using Pressable from React Native
+<Pressable
+  onPress={handlePress}
+  style={({ pressed }) => [
+    styles.card,
+    { transform: [{ scale: pressed ? 0.98 : 1 }] }
+  ]}
+>
+  {children}
+</Pressable>
+```
 
 ---
 
