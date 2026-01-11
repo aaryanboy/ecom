@@ -22,7 +22,7 @@
 ## Core Problem the Project Solves
 1. **Digital Transformation for Mini Markets:** Traditional mini markets lack digital presence and online sales capability
 2. **Manual Inventory Tracking:** Difficulty in tracking stock levels and sales analytics
-3. **Limited Payment Options:** Cash-only transactions limit customer convenience
+3. **Limited Payment Options:** Cash-only transactions limiit customer convenience
 4. **No Personalization:** Traditional stores cannot offer personalized product recommendations
 5. **Order Management Complexity:** Manual order tracking is error-prone and time-consuming
 
