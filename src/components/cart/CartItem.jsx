@@ -1,10 +1,19 @@
 'use client';
 
+import Link from "next/link";
+import Image from "next/image";
+
 export default function CartItem({ item, theme, onRemove, onUpdateQty }) {
   return (
     <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="flex items-center gap-4">
-        <img src={item.imageUrl || '/logo.svg'} alt={item.name} className="w-16 h-16 object-cover rounded" />
+        <Image
+          src={item.imageUrl || '/logo.svg'}
+          alt={item.name}
+          width={64}
+          height={64}
+          className="w-16 h-16 object-cover rounded"
+        />
         <div>
           <h3 className={`font-medium ${theme.text}`}>{item.name}</h3>
           <div className={`flex items-center gap-2 text-sm ${theme.secondaryText}`}>

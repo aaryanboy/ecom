@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { CATEGORIES } from "@/lib/categories";
@@ -201,11 +202,21 @@ export default function EditPost() {
           </ul>
         )}
 
+
+
         {/* Current Image (if any) */}
         {post.imageUrl && (
           <div className="mb-4">
             <label className="block mb-2 font-medium">Current Image</label>
-            <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover rounded-lg border" />
+            <div className="relative w-full h-48">
+              <Image
+                src={post.imageUrl}
+                alt={post.title}
+                fill
+                className="object-cover rounded-lg border"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
           </div>
         )}
 

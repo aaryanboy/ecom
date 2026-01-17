@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 import { useAuth } from "@/app/(auth)/AuthContext";
@@ -119,11 +120,15 @@ export default function ProductDetail() {
             <div className={`relative ${theme.imageBg}`}>
               <div className="aspect-square p-8 flex items-center justify-center">
                 {product.imageUrl ? (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.title}
-                    className="max-w-full max-h-full object-contain rounded-2xl shadow-lg transition-transform duration-500 hover:scale-105"
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.title}
+                      fill
+                      className="object-contain rounded-2xl shadow-lg transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
                 ) : (
                   <div className={`w-48 h-48 rounded-2xl flex items-center justify-center ${theme.border} border-2 border-dashed`}>
                     <span className="text-6xl opacity-30">📷</span>

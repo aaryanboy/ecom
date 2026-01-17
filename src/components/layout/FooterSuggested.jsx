@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useTheme } from "@/app/(theme)/ThemeContext";
 
 const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || "MyShop";
@@ -14,7 +15,7 @@ export default function FooterSuggested() {
         {/* Brand Column */}
         <div className="space-y-4">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt={STORE_NAME} className="h-8 w-8" />
+            <Image src="/logo.svg" alt={STORE_NAME} width={32} height={32} className="h-8 w-8" />
             <span className="text-xl font-bold tracking-tight">{STORE_NAME}</span>
           </Link>
           <p className={`text-sm leading-relaxed ${theme.mutedText}`}>
