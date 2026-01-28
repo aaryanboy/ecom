@@ -126,3 +126,5 @@ Contributions, issues, and feature requests are welcome!
 ---
 
 Made with ❤️ using Next.js
+
+this database shiii is dumb af
