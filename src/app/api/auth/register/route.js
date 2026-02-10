@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db.js";
 import User from "@/models/User.js";
+import { encryptPassword } from "@/lib/cipher.js";
 
 export async function POST(req) {
   try {
@@ -13,12 +14,14 @@ export async function POST(req) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
-    const newUser = new User({ username: name, email, password });
+    const encryptedPassword = encryptPassword(password);
+    const newUser = new User({ username: name, email, password: encryptedPassword });
     await newUser.save();
 
     return NextResponse.json(
-      { message: "User stored successfully",  
-        data: { username: newUser.username, email: newUser.email, isOwner: newUser.isOwner, addresses: newUser.addresses } 
+      {
+        message: "User stored successfully",
+        data: { username: newUser.username, email: newUser.email, isOwner: newUser.isOwner, addresses: newUser.addresses }
       },
       { status: 201 }
     );

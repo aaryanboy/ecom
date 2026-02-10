@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/db.js";
 import User from "@/models/User.js";
 import crypto from "crypto";
+import { decryptPassword } from "@/lib/cipher.js";
 
 // ao
 export async function POST(req) {
@@ -15,7 +16,8 @@ export async function POST(req) {
       return NextResponse.json({ error: "User doesn't exist" }, { status: 400 });
     }
 
-    if (password !== existingUser.password) {
+    const decryptedPassword = decryptPassword(existingUser.password);
+    if (password !== decryptedPassword) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
